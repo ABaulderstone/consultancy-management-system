@@ -1,0 +1,19 @@
+FROM ruby:4.0.1
+
+WORKDIR /app
+
+RUN apt-get update -qq && apt-get install -y \
+  build-essential \
+  nodejs \
+  postgresql-client
+
+# Cache gems layer
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# Copy rest of app
+COPY . .
+
+EXPOSE 3000
+
+CMD ["bash", "-c", "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0"]
