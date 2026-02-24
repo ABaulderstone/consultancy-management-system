@@ -21,6 +21,9 @@ create-db:
 generate:
 	$(DEV_COMPOSE) exec backend rails g $(name)
 
+rails: 
+	$(DEV_COMPOSE) exec backend rails $(command)
+
 logs:
 	$(DEV_COMPOSE) logs -f
 
