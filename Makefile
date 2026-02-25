@@ -29,3 +29,6 @@ logs:
 
 ps:
 	$(DEV_COMPOSE) ps
+
+psql:
+	$(DEV_COMPOSE) exec db psql -U postgres
