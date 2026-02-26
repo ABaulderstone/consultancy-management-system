@@ -9,5 +9,8 @@ FactoryBot.define do
       role { :admin }
     end
 
+    after(:create) do |user|
+      create(:profile, user: user)
+    end
   end
 end

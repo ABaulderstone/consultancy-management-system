@@ -6,13 +6,13 @@ class UsersController < ApplicationController
 
 
   def index
-    users = User.all
-    paginated_response(users, UserBlueprint)
+    users = User.includes(:profile).all
+    paginated_response(users, EnrichedUserBlueprint)
   end
 
 
   def show
-    render json: UserBlueprint.render(@user)
+    render json: EnrichedUserBlueprint.render(@user)
   end
 
   def create
@@ -28,7 +28,7 @@ class UsersController < ApplicationController
 
   def update
     if @user.update(user_params)
-      render json: UserBlueprint.render(@user)
+      render json: EnrichedUserBlueprint.render(@user)
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
@@ -41,13 +41,13 @@ class UsersController < ApplicationController
   end
 
   def current
-    render json: UserBlueprint.render(Current.user)
+    render json: EnrichedUserBlueprint.render(Current.user)
   end
 
     private
 
       def set_user
-        @user = User.find(params[:id])
+        @user = User.includes(:profile).find(params[:id])
       end
 
       def user_params
