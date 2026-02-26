@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "users/current"
+  resources :users
   resource :session, only: [ :show, :create, :destroy ]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
