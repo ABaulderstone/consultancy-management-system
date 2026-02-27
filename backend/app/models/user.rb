@@ -3,6 +3,9 @@ class User < ApplicationRecord
   has_secure_password
   has_one :profile
   has_many :contracts, dependent: :destroy
+  has_one :current_contract,
+        -> { current },
+        class_name: "Contract", dependent: :destroy
 
   validates :email, presence: true, uniqueness: true
 end
