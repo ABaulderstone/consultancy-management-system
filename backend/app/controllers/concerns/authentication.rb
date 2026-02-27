@@ -36,6 +36,6 @@ module Authentication
     end
 
     def unauthorized!
-      render json: { error: "Unauthorized" }, status: :unauthorized
+      raise UnauthorizedError, "Unauthenticated"
     end
 end

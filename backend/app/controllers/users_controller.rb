@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [ :show, :update, :destroy ]
-  before_action :only_admin, only: [ :destroy, :create, :index ]
+  before_action :only_admin!, only: [ :destroy, :create, :index ]
   before_action :authorize_admin_or_self!, only: [ :show, :update ]
 
 
@@ -16,22 +16,14 @@ class UsersController < ApplicationController
   end
 
   def create
-    user = User.new(user_params)
-
-    if user.save
-      render json: UserBlueprint.render(user), status: :created
-    else
-      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
-    end
+    user = User.create!(user_params)
+    render json: UserBlueprint.render(user), status: :created
   end
 
 
   def update
-    if @user.update(user_params)
-      render json: EnrichedUserBlueprint.render(@user)
-    else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-    end
+    @user.update!(user_params)
+    render json: EnrichedUserBlueprint.render(@user)
   end
 
 
@@ -62,6 +54,6 @@ class UsersController < ApplicationController
         return if Current.user.admin?
         return if @user == Current.user
 
-        render json: { error: "Forbidden" }, status: :forbidden
+        raise ForbiddenError, "Forbidden action"
       end
 end

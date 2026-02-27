@@ -4,6 +4,7 @@ class ApplicationController < ActionController::API
   include Pagy::Method
   include Authentication
   include Authorization
+  include ErrorHandling
 
   protect_from_forgery with: :exception
 

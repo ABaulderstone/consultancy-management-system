@@ -21,7 +21,7 @@ class SessionsController < ApplicationController
       }
       render json: UserBlueprint.render(user)
     else
-      render json: { error: "Invalid credentials" }, status: :unauthorized
+      raise UnauthorizedError, "Invalid credentials"
     end
   end
 
