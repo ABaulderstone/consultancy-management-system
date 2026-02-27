@@ -1,8 +1,4 @@
-class Contracts::CreateContract
-  def self.call(...)
-    new(...).call
-  end
-
+class Contracts::CreateContract < ApplicationService
   def initialize(params:)
     @params = params
   end

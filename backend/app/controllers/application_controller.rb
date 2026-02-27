@@ -6,7 +6,8 @@ class ApplicationController < ActionController::API
   include Authorization
   include ErrorHandling
 
-  protect_from_forgery with: :exception
+# TODO - reintroduce CSRF
+# protect_from_forgery with: :exception
 
 private
   def paginated_response(scope, blueprint)

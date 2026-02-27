@@ -16,14 +16,14 @@ class UsersController < ApplicationController
   end
 
   def create
-    user = User.create!(user_params)
-    render json: UserBlueprint.render(user), status: :created
+    result = Users::CreateUser.call(params: user_params)
+    render json: EnrichedUserBlueprint.render(result[:user]), status: :created
   end
 
 
   def update
-    @user.update!(user_params)
-    render json: EnrichedUserBlueprint.render(@user)
+    user = Users::UpdateUser.call(user: @user, params: user_params)
+    render json: EnrichedUserBlueprint.render(user)
   end
 
 
@@ -43,11 +43,7 @@ class UsersController < ApplicationController
       end
 
       def user_params
-        permitted = [ :email, :password ]
-
-        permitted << :role if Current.user.admin?
-
-        params.require(:user).permit(permitted)
+        params.permit(:first_name, :last_name, :date_of_birth, :gender, :title)
       end
 
       def authorize_admin_or_self!
