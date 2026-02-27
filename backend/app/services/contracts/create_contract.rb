@@ -26,6 +26,7 @@ class Contracts::CreateContract
     def close_existing_contract!(user, new_start_date)
       current = user.current_contract
       return unless current
+      return unless current.end_date.nil? || current.end_date >= new_start_date
 
       current.update!(end_date: new_start_date - 1.day)
     end
