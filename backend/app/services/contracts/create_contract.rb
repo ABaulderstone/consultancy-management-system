@@ -6,13 +6,8 @@ class Contracts::CreateContract < ApplicationService
   def call
     ActiveRecord::Base.transaction do
       contract = Contract.new(@params)
-
-      contract.validate!
-
       close_existing_contract!(contract.user, contract.start_date)
-
       contract.save!
-
       contract
     end
   end
