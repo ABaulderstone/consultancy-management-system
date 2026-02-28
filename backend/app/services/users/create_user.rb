@@ -1,4 +1,5 @@
 class Users::CreateUser < ApplicationService
+  include Users::EmailGeneratable
   def initialize(params:)
     @params = params
   end
@@ -15,10 +16,4 @@ class Users::CreateUser < ApplicationService
       { user: user, password: password }
     end
   end
-
-  private
-    def generate_email(id, first_name, last_name)
-      padded_id = id.to_s.rjust(4, "0")
-      "#{first_name.downcase}.#{last_name.downcase}.#{padded_id}@example.com"
-    end
 end
