@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate_user!, only: :create
 
   def show
-    render json: UserBlueprint.render(Current.user)
+    render json: EnrichedUserBlueprint.render(Current.user)
   end
 
 
@@ -19,7 +19,7 @@ class SessionsController < ApplicationController
         secure: Rails.env.production?,
         same_site: :lax
       }
-      render json: UserBlueprint.render(user)
+      render json: EnrichedUserBlueprint.render(user)
     else
       raise UnauthorizedError, "Invalid credentials"
     end
