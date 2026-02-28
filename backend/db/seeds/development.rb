@@ -1,5 +1,3 @@
-require 'factory_bot_rails'
-include FactoryBot::Syntax::Methods
 
 employees = 20.times.map do
   result = Users::CreateUser.call(params: {
@@ -19,7 +17,7 @@ employees.each do |employee|
   max_days_needed = num_contracts * 365
   start_date = Faker::Date.between(from: Date.today - (365 * 5), to: Date.today - max_days_needed)
   base_title = Faker::Job.title
-  levels = ["Junior #{base_title}", "#{base_title}", "Senior #{base_title}", "Lead #{base_title}"].first(num_contracts)
+  levels = [ "Junior #{base_title}", "#{base_title}", "Senior #{base_title}", "Lead #{base_title}" ].first(num_contracts)
   salary = rand(50_000..65_000)
 
   levels.each_with_index do |title, i|
@@ -36,4 +34,3 @@ employees.each do |employee|
     salary += rand(2_000..10_000)
   end
 end
-

@@ -23,6 +23,8 @@ generate:
 
 rails: 
 	$(DEV_COMPOSE) exec backend rails $(command)
+test:
+	$(DEV_COMPOSE) exec backend bundle exec rspec
 
 logs:
 	$(DEV_COMPOSE) logs -f

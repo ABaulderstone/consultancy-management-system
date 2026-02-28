@@ -30,6 +30,8 @@ module Backend
     config.api_only = true
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore
-
+    config.generators do |g|
+      g.test_framework :rspec
+    end
   end
 end
