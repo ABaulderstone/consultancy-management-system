@@ -19,7 +19,7 @@ module ErrorHandling
     end
 
     def render_record_invalid(e)
-      render_error :unprocessable_entity, "Validation failed",
+      render_error :unprocessable_content, "Validation failed",
         errors: e.record.errors.group_by_attribute.transform_values { |errs| errs.map(&:message) }
     end
 
@@ -34,7 +34,8 @@ module ErrorHandling
         message: message,
         path: request.path
       }
-      payload[:details] = errors if errors.present?
-      render json: payload, status: status
+      payload[:details] = errors  if errors.present?
+      render  json: payload, status: status
     end
+
 end

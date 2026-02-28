@@ -24,7 +24,7 @@ generate:
 rails: 
 	$(DEV_COMPOSE) exec backend rails $(command)
 test:
-	$(DEV_COMPOSE) exec backend bundle exec rspec
+	$(DEV_COMPOSE) exec -e RAILS_ENV=test backend bundle exec rspec $(file)
 
 logs:
 	$(DEV_COMPOSE) logs -f

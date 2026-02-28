@@ -5,6 +5,9 @@ require_relative '../config/environment'
 require "database_cleaner/active_record"
 require "shoulda/matchers"
 require "factory_bot_rails"
+require "json_matchers/rspec"
+
+
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 # Uncomment the line below in case you have `--require rails_helper` in the `.rspec` file
@@ -26,7 +29,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
 
 # Ensures that the test database schema matches the current schema file.
 # If there are pending migrations it will invoke `db:test:prepare` to
@@ -95,4 +98,5 @@ RSpec.configure do |config|
 
 
   config.include FactoryBot::Syntax::Methods
+  JsonMatchers.schema_root = "spec/support/api/schemas"
 end

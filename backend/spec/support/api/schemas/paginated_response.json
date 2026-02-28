@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "required": ["data", "meta", "links"],
+  "properties": {
+    "data": { "type": "array" },
+    "meta": {
+      "type": "object",
+      "required": ["page", "limit", "pages", "count"],
+      "properties": {
+        "page": { "type": "integer" },
+        "limit": { "type": "integer" },
+        "pages": { "type": "integer" },
+        "count": { "type": "integer" }
+      }
+    },
+    "links": {
+      "type": "object",
+      "required": ["next", "prev"],
+      "properties": {
+        "next": { "type": ["string", "null"] },
+        "prev": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
