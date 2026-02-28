@@ -29,6 +29,7 @@ class Users::UpdateUser < ApplicationService
 
     # TODO: DRY duplicate email gen.
     def generate_email(id, first_name, last_name)
+      return if first_name.nil? || last_name.nil?
       padded_id = id.to_s.rjust(4, "0")
       "#{first_name.downcase}.#{last_name.downcase}.#{padded_id}@example.com"
     end
