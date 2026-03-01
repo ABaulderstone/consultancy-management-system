@@ -1,0 +1,366 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+  description: HR Management API
+paths:
+  "/session":
+    get:
+      summary: Get current session
+      tags:
+      - Sessions
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: session found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/enriched_user"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+    post:
+      summary: Create session (login)
+      tags:
+      - Sessions
+      parameters: []
+      responses:
+        '200':
+          description: session created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/enriched_user"
+        '401':
+          description: invalid credentials
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+    delete:
+      summary: Destroy session (logout)
+      tags:
+      - Sessions
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: session destroyed
+        '401':
+          description: unauthorized
+  "/users":
+    get:
+      summary: List all users
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: users listed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/paginated_users"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+    post:
+      summary: Create a user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: user created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/enriched_user"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '422':
+          description: validation failed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - first_name
+              - last_name
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                date_of_birth:
+                  type: string
+                gender:
+                  type: string
+  "/users/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: user found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/enriched_user"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+    patch:
+      summary: Update a user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: user updated
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/enriched_user"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '422':
+          description: validation failed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                date_of_birth:
+                  type: string
+                gender:
+                  type: string
+                title:
+                  type: string
+    delete:
+      summary: Delete a user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: user deleted
+        '401':
+          description: unauthorized
+        '403':
+          description: forbidden
+  "/users/current":
+    get:
+      summary: Get current user
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: current user returned
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/enriched_user"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+servers:
+- url: http://localhost:3000
+  description: Development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt
+  schemas:
+    error:
+      type: object
+      required:
+      - status
+      - error
+      - message
+      - path
+      - timestamp
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        timestamp:
+          type: string
+        details:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    enriched_user:
+      type: object
+      required:
+      - id
+      - email
+      - first_name
+      - last_name
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        title:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        date_of_birth:
+          type: string
+          nullable: true
+        age:
+          type: integer
+          nullable: true
+    paginated_users:
+      type: object
+      required:
+      - data
+      - meta
+      - links
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/enriched_user"
+        meta:
+          type: object
+          required:
+          - page
+          - limit
+          - pages
+          - count
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            pages:
+              type: integer
+            count:
+              type: integer
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              nullable: true
+            prev:
+              type: string
+              nullable: true

@@ -44,6 +44,9 @@ gem "image_processing", "~> 1.2"
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
+
+
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -58,8 +61,12 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-
+  # For generating random data in factories and seeding
   gem "faker"
+
+  # For serving api documentation - only in dev mode since this wouldn't be a public api
+  gem "rswag-api"
+  gem "rswag-ui"
 end
 
 group :test do
@@ -68,4 +75,6 @@ group :test do
   gem "shoulda-matchers"
   gem "database_cleaner-active_record"
   gem "json_matchers"
+  # Write specs to generate API docs
+  gem "rswag-specs"
 end

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount Rswag::Api::Engine => '/api-docs'
+  mount Rswag::Ui::Engine => '/api-docs'
   get "users/current"
   resources :users
   resource :session, only: [ :show, :create, :destroy ]
