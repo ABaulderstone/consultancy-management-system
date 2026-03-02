@@ -34,9 +34,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     container_name: app_frontend
-    # Mount dist so Nginx can access it
     volumes:
-      - ./frontend/dist:/app/dist
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
 
@@ -46,9 +46,7 @@ services:
     ports:
       - '80:80'
     volumes:
-      # serving SPA static assets
-      - ./frontend/dist:/usr/share/nginx/html
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
       - frontend
