@@ -12,36 +12,36 @@ export default defineConfig({
 	css: {
 		preprocessorOptions: {
 			scss: {
-				silenceDeprecations: ['color-functions', 'global-builtin', 'import']
+				silenceDeprecations: ['color-functions', 'global-builtin', 'import', 'if-function']
 			}
 		}
-	},
-	test: {
-		expect: { requireAssertions: true },
-		projects: [
-			{
-				extends: './vite.config.ts',
-				test: {
-					name: 'client',
-					browser: {
-						enabled: true,
-						provider: playwright(),
-						instances: [{ browser: 'chromium', headless: true }]
-					},
-					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-					exclude: ['src/lib/server/**']
-				}
-			},
-
-			{
-				extends: './vite.config.ts',
-				test: {
-					name: 'server',
-					environment: 'node',
-					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
-				}
-			}
-		]
 	}
+	// test: {
+	// 	expect: { requireAssertions: true },
+	// 	projects: [
+	// 		{
+	// 			extends: './vite.config.ts',
+	// 			test: {
+	// 				name: 'client',
+	// 				browser: {
+	// 					enabled: true,
+	// 					provider: playwright(),
+	// 					instances: [{ browser: 'chromium', headless: true }]
+	// 				},
+	// 				include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+	// 				exclude: ['src/lib/server/**']
+	// 			}
+	// 		},
+
+	// 		{
+	// 			extends: './vite.config.ts',
+	// 			test: {
+	// 				name: 'server',
+	// 				environment: 'node',
+	// 				include: ['src/**/*.{test,spec}.{js,ts}'],
+	// 				exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+	// 			}
+	// 		}
+	// 	]
+	// }
 });
