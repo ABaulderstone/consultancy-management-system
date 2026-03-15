@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements'
 
-  interface Props extends HTMLButtonAttributes {
+  interface ButtonProps extends HTMLButtonAttributes {
     variant?: 'primary' | 'secondary' | 'danger' | 'outline-primary' | 'outline-secondary'
     size?: 'sm' | 'lg'
     loading?: boolean
@@ -15,7 +15,7 @@
     children,
     class: className,
     ...rest 
-  }: Props = $props()
+  }: ButtonProps = $props()
 </script>
 
 <button

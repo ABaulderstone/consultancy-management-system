@@ -9,4 +9,11 @@ export default defineConfig({
     port: 5173,
     allowedHosts: ['frontend'],
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
+      },
+    },
+  },
 });
