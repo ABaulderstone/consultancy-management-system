@@ -6,7 +6,9 @@
 	import '../app.scss';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
+
 	import type { Snippet } from 'svelte';
 	import { sessionApi } from '$lib/api/session';
 	import { authStore } from '$lib/stores/auth.svelte';
@@ -26,7 +28,7 @@
 			authStore.loading = false;
 		}
 	});
-	const isPublic = $derived(PUBLIC_ROUTES.includes($page.url.pathname));
+	const isPublic = $derived(PUBLIC_ROUTES.includes(page.url.pathname));
 	const shouldShowSpinner = $derived(
 		authStore.loading || (!authStore.user && !isPublic) || (!!authStore.user && isPublic)
 	);
@@ -34,11 +36,9 @@
 	$effect(() => {
 		if (authStore.loading) return;
 		if (!authStore.user && !isPublic) {
-			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			goto('/login');
+			goto(resolve('/login'));
 		} else if (authStore.user && isPublic) {
-			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			goto('/');
+			goto(resolve('/'));
 		}
 	});
 </script>

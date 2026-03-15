@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	import { goto } from '$app/navigation';
 	import { superForm } from 'sveltekit-superforms';
 	import { z } from 'zod/v4';
@@ -37,8 +39,7 @@
 				formHelpers!,
 				async (data) => {
 					authStore.user = await sessionApi.create(data);
-					// eslint-disable-next-line svelte/no-navigation-without-resolve
-					goto('/');
+					goto(resolve('/'));
 				}
 			);
 		}
