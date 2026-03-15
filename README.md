@@ -141,7 +141,7 @@ make test file=spec/requests/users_spec.rb:45
 - **Request specs** — full HTTP stack tests with JSON schema validation on every response shape using `json_matchers`
 - **Database isolation** — per-test isolation via DatabaseCleaner with transaction strategy
 
-# Backend Architectural Decisions
+# Backend Architectural Decisions 
 
 ### Service Object Pattern
 
