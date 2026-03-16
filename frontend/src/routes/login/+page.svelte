@@ -14,6 +14,7 @@
 	import Button from '$lib/components/ui/Button/Button.svelte';
 	import type { FormHelpers } from '../../lib/types/form';
 	import { handleFormSubmit } from '../../lib/utils/form';
+	import { toast } from 'svelte-sonner';
 
 	const schema = z.object({
 		email: z.email(),
@@ -32,7 +33,7 @@
 			await handleFormSubmit(
 				form.data as LoginData,
 				(field, message) =>
-					form.errors.update((current: Record<string, unknown>) => ({
+					errors.update((current: Record<string, unknown>) => ({
 						...current,
 						[field]: [message]
 					})),
@@ -40,11 +41,11 @@
 				async (data) => {
 					authStore.user = await sessionApi.create(data);
 					goto(resolve('/'));
+					toast.success('Logged in');
 				}
 			);
 		}
 	});
-
 	const { form: formData, errors, submitting } = form;
 </script>
 

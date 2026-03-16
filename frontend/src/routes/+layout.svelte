@@ -13,7 +13,7 @@
 	import { sessionApi } from '$lib/api/session';
 	import { authStore } from '$lib/stores/auth.svelte';
 	import favicon from '$lib/assets/favicon.svg';
-	import { Toaster } from 'svelte-sonner';
+	import { toast, Toaster } from 'svelte-sonner';
 
 	let { children }: { children: Snippet } = $props();
 
@@ -37,6 +37,7 @@
 		if (authStore.loading) return;
 		if (!authStore.user && !isPublic) {
 			goto(resolve('/login'));
+			toast.error('You need to be logged in to do that');
 		} else if (authStore.user && isPublic) {
 			goto(resolve('/'));
 		}
@@ -47,7 +48,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<Toaster richColors position="bottom-right" />
+<Toaster closeButton richColors position="bottom-right" />
 
 {#if shouldShowSpinner}
 	<div class="min-vh-100 d-flex align-items-center justify-content-center">

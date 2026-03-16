@@ -1,6 +1,6 @@
 class EnrichedUserBlueprint < Blueprinter::Base
   identifier :id
-  fields :email
+  fields :email, :role
 
   field :first_name do |user, _options|
     user.profile&.first_name
@@ -25,4 +25,5 @@ class EnrichedUserBlueprint < Blueprinter::Base
   field :age do |user, _options|
     user.profile&.age
   end
+
 end
