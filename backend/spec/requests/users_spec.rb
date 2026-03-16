@@ -26,50 +26,54 @@ end
         expect(json_response["data"].first).to match_response_schema("enriched_user")
       end
 
-      context "when admin" do
-  let(:headers) { auth_headers(admin) }
+      it "returns paginated response" do
+        create_list(:user, 3)
+        get "/users", headers: headers
+        expect(response).to have_http_status(:ok)
+        expect(response).to match_response_schema("paginated_response")
+      end
 
-  it "returns paginated response" do
-    create_list(:user, 3)
-    get "/users", headers: headers
-    expect(response).to have_http_status(:ok)
-    expect(response).to match_response_schema("paginated_response")
+      it "returns enriched user schema for each record" do
+        get "/users", headers: headers
+        expect(json_response["data"].first).to match_response_schema("enriched_user")
+      end
+
+      context "with sort params" do
+        it "sorts by first_name asc" do
+          zara = create(:user)
+          zara.profile.update!(first_name: "Zara")
+          aaron = create(:user)
+          aaron.profile.update!(first_name: "Aaron")
+          get "/users", params: { sort: "first_name", direction: "asc" }, headers: headers
+          expect(response).to have_http_status(:ok)
+          expect(json_response["data"].first["first_name"]).to eq("Aaron")
+          expect(json_response["data"].last["first_name"]).to eq("Zara")
+        end
+
+        it "sorts by first_name desc" do
+          zara = create(:user)
+          zara.profile.update!(first_name: "Zara")
+          aaron = create(:user)
+          aaron.profile.update!(first_name: "Aaron")
+          get "/users", params: { sort: "first_name", direction: "desc" }, headers: headers
+          expect(response).to have_http_status(:ok)
+          expect(json_response["data"].first["first_name"]).to eq("Zara")
+          expect(json_response["data"].last["first_name"]).to eq("Aaron")
+
+        end
+
+        it "ignores invalid sort column and defaults to id" do
+          get "/users", params: { sort: "malicious_input", direction: "asc" }, headers: headers
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "ignores invalid direction and defaults to asc" do
+          get "/users", params: { sort: "first_name", direction: "invalid" }, headers: headers
+          expect(response).to have_http_status(:ok)
+        end
   end
 
-  it "returns enriched user schema for each record" do
-    get "/users", headers: headers
-    expect(json_response["data"].first).to match_response_schema("enriched_user")
-  end
 
-  context "with sort params" do
-    it "sorts by first_name asc" do
-      create(:user, profile: build(:profile, first_name: "Zara"))
-      create(:user, profile: build(:profile, first_name: "Aaron"))
-      get "/users", params: { sort: "first_name", direction: "asc" }, headers: headers
-      expect(response).to have_http_status(:ok)
-      expect(json_response["data"].first["firstName"]).to eq("Aaron")
-      expect(json_response["data"].last["firstName"]).to eq("Zara")
-    end
-
-    it "sorts by first_name desc" do
-      create(:user, profile: build(:profile, first_name: "Zara"))
-      create(:user, profile: build(:profile, first_name: "Aaron"))
-      get "/users", params: { sort: "first_name", direction: "desc" }, headers: headers
-      expect(response).to have_http_status(:ok)
-      expect(json_response["data"].first["firstName"]).to eq("Zara")
-    end
-
-    it "ignores invalid sort column and defaults to id" do
-      get "/users", params: { sort: "malicious_input", direction: "asc" }, headers: headers
-      expect(response).to have_http_status(:ok)
-    end
-
-    it "ignores invalid direction and defaults to asc" do
-      get "/users", params: { sort: "first_name", direction: "invalid" }, headers: headers
-      expect(response).to have_http_status(:ok)
-    end
-  end
-end
     end
 
 

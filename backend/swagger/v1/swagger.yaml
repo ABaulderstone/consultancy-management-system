@@ -76,6 +76,35 @@ paths:
       security:
       - bearerAuth: []
       - cookieAuth: []
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: sort
+        in: query
+        required: false
+        enum:
+        - first_name
+        - last_name
+        - email
+        schema:
+          type: string
+        description: ":\n * `first_name` \n * `last_name` \n * `email` \n "
+      - name: direction
+        in: query
+        required: false
+        enum:
+        - asc
+        - desc
+        schema:
+          type: string
       responses:
         '200':
           description: users listed

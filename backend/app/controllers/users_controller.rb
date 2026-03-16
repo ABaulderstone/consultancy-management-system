@@ -7,7 +7,7 @@ class UsersController < ApplicationController
 
   def index
     allowed_sort_columns = %w[first_name last_name email]
-    sort_column = allowed_sort_columns.include?(params[:sort]) ? params[:sort] : 'user.id'
+    sort_column = allowed_sort_columns.include?(params[:sort]) ? params[:sort] : 'users.id'
     sort_direction = %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
 
     users = User.left_joins(:profile).order("#{sort_column} #{sort_direction}")
