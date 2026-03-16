@@ -13,6 +13,13 @@ RSpec.describe "Users API", type: :request do
       security [ { bearerAuth: [] }, { cookieAuth: [] } ]
       produces "application/json"
 
+        parameter name: :page, in: :query, type: :integer, required: false
+        parameter name: :limit, in: :query, type: :integer, required: false
+        parameter name: :sort, in: :query, type: :string, required: false,
+                  enum: %w[first_name last_name email]
+        parameter name: :direction, in: :query, type: :string, required: false,
+                  enum: %w[asc desc]
+
       response "200", "users listed" do
         schema "$ref" => "#/components/schemas/paginated_users"
         run_test!
