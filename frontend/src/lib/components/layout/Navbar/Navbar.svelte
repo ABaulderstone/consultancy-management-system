@@ -2,10 +2,13 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toast } from 'svelte-sonner';
+	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
+	import { faHome } from '@fortawesome/free-solid-svg-icons';
 	import { authStore } from '$lib/stores/auth.svelte';
 	import { sessionApi } from '$lib/api/session';
 	import type { Role } from '$lib/types/user';
 	import { resolve } from '$app/paths';
+	import Button from '../../ui/Button';
 
 	interface NavLink {
 		label: string;
@@ -44,7 +47,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
 	<div class="container">
-		<a class="navbar-brand fw-semibold" href={resolve('/')}> HR App </a>
+		<a class="navbar-brand fw-semibold" href={resolve('/')}> <FontAwesomeIcon icon={faHome} /></a>
 
 		<button
 			class="navbar-toggler"
@@ -80,7 +83,7 @@
 						{authStore.user.firstName}
 						{authStore.user.lastName}
 					</span>
-					<button class="btn btn-outline-secondary btn-sm" onclick={handleLogout}> Logout </button>
+					<Button variant="outline-secondary" onclick={handleLogout}>Logout</Button>
 				{/if}
 			</div>
 		</div>
