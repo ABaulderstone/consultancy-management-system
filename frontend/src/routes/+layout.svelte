@@ -14,6 +14,7 @@
 	import { authStore } from '$lib/stores/auth.svelte';
 	import favicon from '$lib/assets/favicon.svg';
 	import { toast, Toaster } from 'svelte-sonner';
+	import Navbar from '../lib/components/layout/Navbar';
 
 	let { children }: { children: Snippet } = $props();
 
@@ -55,5 +56,8 @@
 		<div class="spinner-border" role="status"></div>
 	</div>
 {:else}
+	{#if !isPublic}
+		<Navbar />
+	{/if}
 	{@render children()}
 {/if}
