@@ -15,6 +15,9 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { toast, Toaster } from 'svelte-sonner';
 	import Navbar from '../lib/components/layout/Navbar';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+
+	const queryClient = new QueryClient();
 
 	let { children }: { children: Snippet } = $props();
 
@@ -49,15 +52,17 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<Toaster closeButton richColors position="bottom-right" />
+<QueryClientProvider client={queryClient}>
+	<Toaster closeButton richColors position="bottom-right" />
 
-{#if shouldShowSpinner}
-	<div class="min-vh-100 d-flex align-items-center justify-content-center">
-		<div class="spinner-border" role="status"></div>
-	</div>
-{:else}
-	{#if !isPublic}
-		<Navbar />
+	{#if shouldShowSpinner}
+		<div class="min-vh-100 d-flex align-items-center justify-content-center">
+			<div class="spinner-border" role="status"></div>
+		</div>
+	{:else}
+		{#if !isPublic}
+			<Navbar />
+		{/if}
+		{@render children()}
 	{/if}
-	{@render children()}
-{/if}
+</QueryClientProvider>

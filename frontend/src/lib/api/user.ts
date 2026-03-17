@@ -2,6 +2,7 @@ import { httpClient } from './client';
 import type { EnrichedUser } from '../types/user';
 import type { PaginatedResponse, ApiRequestBody } from '../types/api';
 import type { SortDirection } from '../types/data-table';
+import { toSnakeCase } from '../utils/string';
 
 export interface CreateUserParams extends ApiRequestBody {
 	firstName: string;
@@ -25,7 +26,7 @@ export const usersApi = {
 			limit: String(limit)
 		});
 		if (sort && direction) {
-			params.append('sort', sort);
+			params.append('sort', toSnakeCase(sort));
 			params.append('direction', direction);
 		}
 		return httpClient.get<PaginatedResponse<EnrichedUser>>(`/users?${params}`);

@@ -17,8 +17,13 @@
 				? faSortUp
 				: faSortDown
 	);
+	$effect(() => {
+		console.log('sortState in SortIcon', colKey, sortState);
+	});
 </script>
 
 <span class="ms-1 small">
-	<FontAwesomeIcon {icon} />
+	{#key icon}
+		<FontAwesomeIcon {icon} />
+	{/key}
 </span>
