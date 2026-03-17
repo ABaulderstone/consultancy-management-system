@@ -36,3 +36,5 @@ psql:
 	$(DEV_COMPOSE) exec db psql -U postgres
 swagger:
 	$(DEV_COMPOSE) exec -e RAILS_ENV=test backend bundle exec rails rswag:specs:swaggerize
+storybook:
+	$(DEV_COMPOSE) exec frontend npm run storybook
