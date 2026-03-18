@@ -121,6 +121,25 @@ The OpenAPI spec is generated directly from RSpec integration tests using rswag,
 
 ### Testing
 
+#### Frontend
+
+There will be three pillars of frontend testing.
+`Storybook` for UI components. Particularly useful to visualise the impact of props or changing component state, and allows the tracking of functions on click, submit etc.
+
+##### Running Storybook
+
+```bash
+make storybook
+```
+
+## Storybook is available at `http://localhost:6006`.
+
+`vitest` will be used for unit testing utility and helper functions. If required `@testing-library` may be added for complex component interactions, but at this stage is not necessary.
+
+---
+
+`Playwright` will be used for end to end testing of pages - with mocked fetch calls
+
 #### Backend
 
 The test suite covers models, service objects, and request specs with JSON schema validation on all responses.
@@ -141,7 +160,7 @@ make test file=spec/requests/users_spec.rb:45
 - **Request specs** — full HTTP stack tests with JSON schema validation on every response shape using `json_matchers`
 - **Database isolation** — per-test isolation via DatabaseCleaner with transaction strategy
 
-# Backend Architectural Decisions 
+# Backend Architectural Decisions
 
 ### Service Object Pattern
 
@@ -200,3 +219,39 @@ All collection endpoints return a consistent paginated envelope via Pagy:
   "links": { "next": "...", "prev": null }
 }
 ```
+
+# Frontend Architectural Decisions
+
+### Technology Choices
+
+**SvelteKit** was chosen over plain Svelte for several reasons. Svelte 5 introduced a significantly new reactivity model and the third-party routing ecosystem hadn't caught up at the time of writing — SvelteKit's file based routing system was an easy choice - it was also familiar to `Next Js` which I have worked quite a bit in. It also leaves the door open for server-side rendering in future without any architectural changes, and its `$app/*` modules integrate cleanly with Storybook's SvelteKit addon.
+
+**Bootstrap 5** via SCSS gives predictable, well-documented styling with a comprehensive component library. But also allows for easy overrides at a component level. This project does not use bootstrap js and instead relies on Svelte's reactivity model for UI interactions.
+
+**TanStack Query** manages all server state. It provides automatic caching, background refetching, and separate `isLoading`/`isFetching`/`isError` states.
+
+**Superforms with Zod** handles form state, validation and submission. Validation errors from the Rails API are mapped back onto form fields using the same field-level error structure, so backend validation errors appear inline exactly like client-side ones. A shared `handleFormSubmit` utility centralises this error mapping so individual forms only need to provide their happy path logic.
+
+**Storybook** is used for component development and visual testing in isolation. It's particularly valuable for stateful UI components like the data table (loading, fetching, empty, error, sorted states) and form inputs (default, error, disabled).
+
+### API Layer
+
+The frontend communicates with the Rails backend through a typed HTTP client in `src/lib/api/`. The client handles automatic camelCase/snake_case conversion in both directions so the frontend always works with camelCase and Rails always receives snake_case. It also centralises authentication via `credentials: 'include'`, and error parsing into typed `ApiError` instances.
+
+### Component Structure
+
+```
+src/lib/components/
+├── ui/           # Generic, domain-agnostic components
+│   ├── Button/
+│   ├── Modal/
+│   ├── DataTable/
+│   ├── Pagination/
+│   └── Form/
+├── users/        # Domain-specific components
+│   └── UserTable/
+└── layout/
+    └── Navbar/
+```
+
+UI components are designed to be reusable without domain knowledge. Domain components like `UserTable` compose UI components with application-specific column definitions and data shapes.
