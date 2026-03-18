@@ -1,14 +1,14 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
+	import type { Snippet } from 'svelte';
 
-  interface FormRowProps {
-    children: Snippet
-    class?: string
-  }
+	interface FormRowProps {
+		children: Snippet;
+		class?: string;
+	}
 
-  let { children, class: className = '' }: FormRowProps = $props()
+	let { children, class: className = '' }: FormRowProps = $props();
 </script>
 
-<div class="form-row {className}">
-  {@render children()}
+<div class="row g-3 {className}">
+	{@render children()}
 </div>
