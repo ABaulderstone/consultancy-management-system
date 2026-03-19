@@ -6,6 +6,9 @@ class User < ApplicationRecord
   has_one :current_contract,
         -> { current },
         class_name: "Contract", dependent: :destroy
+  has_one :active_assignment, -> {active}, class_name: "Assignment"
+  has_one :current_job, through: :active_assignment, source: :job
+
 
   validates :email, presence: true, uniqueness: true
 end
