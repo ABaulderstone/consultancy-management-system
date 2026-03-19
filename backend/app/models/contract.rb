@@ -60,6 +60,7 @@ class Contract < ApplicationRecord
   def rate_within_salary_band
     return if contractor?
     return unless position&.min_salary && position&.max_salary
+    return unless rate
     unless rate.between?(position.min_salary, position.max_salary)
       errors.add(:rate, "must be within the position salary band (#{position.min_salary} - #{position.max_salary})")
     end
