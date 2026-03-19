@@ -10,6 +10,7 @@ class Contract < ApplicationRecord
   validate :end_date_after_start_date
   validate :only_one_active_contract
   validate :fte_present_for_non_contractors
+  validate :fte_absent_for_contractors
   validate :rate_within_salary_band
 
 
@@ -47,6 +48,14 @@ class Contract < ApplicationRecord
       errors.add(:fte, "is required for non-contractor contracts")
     end
   end
+
+  def fte_absent_for_contractors
+    return unless contractor?
+    if fte.present?
+      errors.add(:fte, "must be blank for contractor contracts")
+    end
+  end
+
 
   def rate_within_salary_band
     return if contractor?
