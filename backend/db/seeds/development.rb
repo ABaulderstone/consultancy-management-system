@@ -148,12 +148,15 @@ job_queue = open_jobs.shuffle
     job = historical_job_queue.pop
     assignment_start = [contract_start, job.start_date].max
     assignment_end = [contract_end, job.end_date].min
-    Assignment.create!(
-      job: job,
-      user: user,
-      start_date: assignment_start,
-      end_date: assignment_end
-    )
+
+    if assignment_end > assignment_start
+      Assignment.create!(
+        job: job,
+        user: user,
+        start_date: assignment_start,
+        end_date: assignment_end
+      )
+    end
   end
 end
 

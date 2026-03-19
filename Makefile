@@ -26,6 +26,9 @@ rails:
 test:
 	$(DEV_COMPOSE) exec -e RAILS_ENV=test backend bundle exec rspec $(file)
 
+reset-db:
+	$(DEV_COMPOSE) exec -e RAILS_ENV=development backend rails db:drop db:create db:migrate db:seed
+	
 logs:
 	$(DEV_COMPOSE) logs -f
 
