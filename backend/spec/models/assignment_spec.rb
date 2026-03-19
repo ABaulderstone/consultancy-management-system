@@ -40,11 +40,11 @@ RSpec.describe Assignment, type: :model do
       expect(assignment.errors[:user]).to include("is already assigned to a job")
     end
 
-    it "is valid when user has no active assignment" do
-      create(:assignment, user: user, end_date: Date.today - 1.month)
-      assignment = build(:assignment, user: user, end_date: nil)
-      expect(assignment).to be_valid
-    end
+      it "is valid when user has no active assignment" do
+        create(:assignment, user: user, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
+        assignment = build(:assignment, user: user, end_date: nil)
+        expect(assignment).to be_valid
+      end
   end
 
   describe "job_not_already_assigned" do
@@ -58,7 +58,7 @@ RSpec.describe Assignment, type: :model do
     end
 
     it "is valid when job has no active assignment" do
-      create(:assignment, job: job, end_date: Date.today - 1.month)
+      create(:assignment, job: job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
       assignment = build(:assignment, job: job, end_date: nil)
       expect(assignment).to be_valid
     end

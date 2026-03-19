@@ -6,8 +6,9 @@ class Job < ApplicationRecord
   validates :day_rate, numericality: { greater_than: 0 }
   validate :end_date_after_start_date
 
-  scope :active, -> { where(end_date: nil) }
-  scope :completed, -> { where.not(end_date: nil) }
+  scope :active, -> { where("start_date <= ? AND (end_date IS NULL OR end_date >= ?)", Date.today, Date.today) }
+  scope :completed, -> { where("end_date < ?", Date.today) }
+  scope :upcoming, -> { where("start_date > ?", Date.today) }
 
   private
 

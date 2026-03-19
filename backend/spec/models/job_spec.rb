@@ -33,18 +33,29 @@ RSpec.describe Job, type: :model do
   end
 
   describe "scopes" do
-    it "active returns jobs with no end date" do
-      active = create(:job, end_date: nil)
-      completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
-      expect(Job.active).to include(active)
-      expect(Job.active).not_to include(completed)
-    end
+      it "active returns jobs that have started and not ended" do
+        active = create(:job, start_date: Date.today - 1.month, end_date: nil)
+        active_with_future_end = create(:job, start_date: Date.today - 1.month, end_date: Date.today + 1.month)
+        completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
+        upcoming = create(:job, start_date: Date.today + 1.month, end_date: nil)
+        expect(Job.active).to include(active, active_with_future_end)
+        expect(Job.active).not_to include(completed, upcoming)
+      end
 
-    it "completed returns jobs with an end date" do
-      active = create(:job, start_date: Date.today - 2.months, end_date: nil)
-      completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
-      expect(Job.completed).to include(completed)
-      expect(Job.completed).not_to include(active)
-    end
-  end
+      it "completed returns jobs whose end date has passed" do
+        completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
+        active = create(:job, start_date: Date.today - 1.month, end_date: nil)
+        expect(Job.completed).to include(completed)
+        expect(Job.completed).not_to include(active)
+      end
+
+      it "upcoming returns jobs that have not started yet" do
+        upcoming = create(:job, start_date: Date.today + 1.month, end_date: nil)
+        active = create(:job, start_date: Date.today - 1.month, end_date: nil)
+        completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
+        expect(Job.upcoming).to include(upcoming)
+        expect(Job.upcoming).not_to include(active, completed)
+      end
+
+  end 
 end
