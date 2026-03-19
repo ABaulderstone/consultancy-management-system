@@ -1,12 +1,15 @@
 
-DAY_RATE = 550
+JUNIOR_DAY_RATE = 550
+SENIOR_DAY_RATE = 650
 
-POSITION_DATA = [
-  { title: "Junior Frontend Developer", min_salary: 55_000, max_salary: 70_000 },
-  { title: "Junior Backend Developer", min_salary: 55_000, max_salary: 70_000 },
-  { title: "Junior Full Stack Developer", min_salary: 55_000, max_salary: 70_000 },
-  { title: "Junior DevOps Engineer", min_salary: 58_000, max_salary: 72_000 },
-  { title: "Junior Site Reliability Engineer", min_salary: 58_000, max_salary: 72_000 },
+JOB_TITLES = [
+  "Frontend Developer",
+  "Backend Developer",
+  "Full Stack Developer",
+  "DevOps Engineer",
+  "Site Reliability Engineer",
+  "Business Analyst",
+  "QA Engineer",
 ].freeze
 
 puts "Seeding departments..."
@@ -27,42 +30,25 @@ hr_position = Position.find_or_create_by!(title: "HR Manager") do |p|
   p.max_salary = 100_000
 end
 
-positions = POSITION_DATA.map do |data|
-  Position.find_or_create_by!(title: data[:title]) do |p|
-    p.department = dev
-    p.min_salary = data[:min_salary]
-    p.max_salary = data[:max_salary]
-  end
+junior_position = Position.find_or_create_by!(title: "Software Consultant") do |p|
+  p.department = dev
+  p.min_salary = 55_000
+  p.max_salary = 70_000
 end
+
+senior_position = Position.find_or_create_by!(title: "Senior Software Consultant") do |p|
+  p.department = dev
+  p.min_salary = 75_000
+  p.max_salary = 95_000
+end
+
+
 
 puts "Seeding clients..."
 
 clients = 10.times.map do
   Client.find_or_create_by!(name: Faker::Company.unique.name)
 end
-
-puts "Seeding jobs..."
-open_jobs = 60.times.map do
-  Job.create!(
-    client: clients.sample,
-    start_date: Faker::Date.between(from: Date.today - 365, to: Date.today - 30),
-    end_date: nil,
-    day_rate: DAY_RATE
-  )
-end
-
-40.times do
-  start_date = Faker::Date.between(from: Date.today - (365 * 5), to: Date.today - 730)
-  Job.create!(
-    client: clients.sample,
-    start_date: start_date,
-    end_date: start_date + rand(180..730),
-    day_rate: DAY_RATE
-  )
-end
-
-historical_jobs = Job.where.not(end_date: nil).to_a.shuffle
-historical_job_queue = historical_jobs.dup
 
 
 
@@ -100,14 +86,14 @@ puts "Seeding employees..."
 employee_statuses = (
   [:active_job] * 60 +
   [:bench] * 20 +
-  [:departed] * 20
+  [:departed] * 10 +
+  [:promoted] * 10
 ).shuffle
 
-job_queue = open_jobs.shuffle
+
 
 100.times do
   status = employee_statuses.pop
-  position = positions.sample
 
   result = Users::CreateUser.call(params: {
     first_name: Faker::Name.first_name,
@@ -119,44 +105,160 @@ job_queue = open_jobs.shuffle
   user = result[:user]
   puts "Created: #{user.email} / #{result[:password]}"
 
-  contract_start = Faker::Date.between(
-    from: Date.today - (365 * 5),
-    to: Date.today - 365
-  )
 
-  contract_end = status == :departed ? contract_start + rand(365..730) : nil
+  case status
+  when :active_job
+    contract_start = Faker::Date.between(
+      from: Date.today - (365 * 5),
+      to: Date.today - 365
+    )
 
-  Contracts::CreateContract.call(params: {
-    user_id: user.id,
-    position_id: position.id,
-    contract_type: :full_time,
-    fte: 1.0,
-    rate: rand(position.min_salary.to_i..position.max_salary.to_i),
-    start_date: contract_start,
-    end_date: contract_end
-  })
+    Contracts::CreateContract.call(params: {
+      user_id: user.id,
+      position_id: junior_position.id,
+      contract_type: :full_time,
+      fte: 1.0,
+      rate: rand(junior_position.min_salary.to_i..junior_position.max_salary.to_i),
+      start_date: contract_start,
+      end_date: nil
+    })
 
-  if status == :active_job && job_queue.any?
-    job = job_queue.pop
+    job_start = contract_start + rand(1..14)
+    job = Job.create!(
+      client: clients.sample,
+      title: JOB_TITLES.sample,
+      start_date: job_start,
+      end_date: nil,
+      day_rate: JUNIOR_DAY_RATE
+    )
+
     Assignment.create!(
       job: job,
       user: user,
-      start_date: [contract_start, job.start_date].max,
+      start_date: job_start,
       end_date: nil
     )
-  elsif status == :departed && historical_job_queue.any?
-    job = historical_job_queue.pop
-    assignment_start = [contract_start, job.start_date].max
-    assignment_end = [contract_end, job.end_date].min
 
-    if assignment_end > assignment_start
+  when :bench
+  contract_start = Faker::Date.between(
+    from: Date.today - 30,
+    to: Date.today - 1
+  )
+
+    Contracts::CreateContract.call(params: {
+      user_id: user.id,
+      position_id: junior_position.id,
+      contract_type: :full_time,
+      fte: 1.0,
+      rate: rand(junior_position.min_salary.to_i..junior_position.max_salary.to_i),
+      start_date: contract_start,
+      end_date: nil
+    })
+
+  when :departed
+    contract_start = Faker::Date.between(
+      from: Date.today - (365 * 5),
+      to: Date.today - (365 * 2)
+    )
+    contract_end = contract_start + rand(365..730)
+
+    Contracts::CreateContract.call(params: {
+      user_id: user.id,
+      position_id: junior_position.id,
+      contract_type: :full_time,
+      fte: 1.0,
+      rate: rand(junior_position.min_salary.to_i..junior_position.max_salary.to_i),
+      start_date: contract_start,
+      end_date: contract_end
+    })
+
+    job_start = contract_start + rand(1..14)
+    job_end = contract_end - rand(1..14)
+
+    if job_end > job_start
+      job = Job.create!(
+        client: clients.sample,
+        title: JOB_TITLES.sample,
+        start_date: job_start,
+        end_date: job_end,
+        day_rate: JUNIOR_DAY_RATE
+      )
+
       Assignment.create!(
         job: job,
         user: user,
-        start_date: assignment_start,
-        end_date: assignment_end
+        start_date: job_start,
+        end_date: job_end
       )
     end
+
+  when :promoted
+    junior_contract_start = Faker::Date.between(
+      from: Date.today - (365 * 5),
+      to: Date.today - (365 * 2)
+    )
+    junior_contract_end = junior_contract_start + rand(365..730)
+
+    Contracts::CreateContract.call(params: {
+      user_id: user.id,
+      position_id: junior_position.id,
+      contract_type: :full_time,
+      fte: 1.0,
+      rate: rand(junior_position.min_salary.to_i..junior_position.max_salary.to_i),
+      start_date: junior_contract_start,
+      end_date: junior_contract_end
+    })
+
+    # junior job starts shortly after contract, ends before contract ends
+    junior_job_start = junior_contract_start + rand(1..14)
+    junior_job_end = junior_contract_end - rand(1..14)
+
+    if junior_job_end > junior_job_start
+      junior_job = Job.create!(
+        client: clients.sample,
+        title: JOB_TITLES.sample,
+        start_date: junior_job_start,
+        end_date: junior_job_end,
+        day_rate: JUNIOR_DAY_RATE
+      )
+
+      Assignment.create!(
+        job: junior_job,
+        user: user,
+        start_date: junior_job_start,
+        end_date: junior_job_end
+      )
+    end
+
+    # senior contract starts 0-14 days after junior contract ends (bench period)
+    senior_contract_start = junior_contract_end + rand(0..14)
+
+    Contracts::CreateContract.call(params: {
+      user_id: user.id,
+      position_id: senior_position.id,
+      contract_type: :full_time,
+      fte: 1.0,
+      rate: rand(senior_position.min_salary.to_i..senior_position.max_salary.to_i),
+      start_date: senior_contract_start,
+      end_date: nil
+    })
+
+    senior_job_start = senior_contract_start
+
+    senior_job = Job.create!(
+      client: clients.sample,
+      title: JOB_TITLES.sample,
+      start_date: senior_job_start,
+      end_date: nil,
+      day_rate: SENIOR_DAY_RATE
+    )
+
+    Assignment.create!(
+      job: senior_job,
+      user: user,
+      start_date: senior_job_start,
+      end_date: nil
+    )
   end
 end
 

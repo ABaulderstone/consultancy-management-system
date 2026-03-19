@@ -67,7 +67,7 @@ RSpec.describe Assignment, type: :model do
   describe "scopes" do
     it "active returns assignments with no end date" do
       active = create(:assignment, end_date: nil)
-      completed = create(:assignment, end_date: Date.today - 1.month)
+      completed = create(:assignment, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
       expect(Assignment.active).to include(active)
       expect(Assignment.active).not_to include(completed)
     end

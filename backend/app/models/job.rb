@@ -2,7 +2,7 @@ class Job < ApplicationRecord
   belongs_to :client
   has_one :assignment
 
-  validates :start_date, :day_rate, presence: true
+  validates :start_date, :day_rate, :title, presence: true
   validates :day_rate, numericality: { greater_than: 0 }
   validate :end_date_after_start_date
 

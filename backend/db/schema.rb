@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_19_025310) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_221404) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_025310) do
     t.decimal "day_rate", precision: 10, scale: 2, null: false
     t.date "end_date"
     t.date "start_date", null: false
+    t.string "title"
     t.datetime "updated_at", null: false
     t.index ["client_id"], name: "index_jobs_on_client_id"
   end
