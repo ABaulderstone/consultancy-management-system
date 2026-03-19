@@ -6,13 +6,19 @@ class UsersController < ApplicationController
 
 
 def index
-  allowed_sort_columns = %w[first_name last_name email]
+    allowed_sort_columns = {
+    'first_name' => 'profiles.first_name',
+    'last_name' => 'profiles.last_name',
+    'email' => 'users.email'
+  }
+
   sort_column = allowed_sort_columns.include?(params[:sort]) ? params[:sort] : 'users.id'
   sort_direction = %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
 
   users = User
     .with_status_select
     .includes(:profile, :active_assignment, current_contract: { position: :department })
+    .left_joins(:profile)
 
   users = users.where(role: params[:role]) if params[:role].present?
 
