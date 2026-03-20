@@ -26,7 +26,7 @@ I hope to build out:
 
 **Backend:** Ruby on Rails 8 (API mode), PostgreSQL, JWT authentication
 
-**Frontend:** Svelte, TypeScript, SCSS, Vite
+**Frontend:** SvelteKit, TypeScript, SCSS, Vite
 
 **Infrastructure:** Docker, Docker Compose, Nginx reverse proxy
 
@@ -35,13 +35,13 @@ I hope to build out:
 The project is a monorepo with three core services orchestrated via Docker Compose:
 
 - `backend` — Rails 8 API running on port 3000
-- `frontend` — Svelte/Vite app, compiled to static assets served by Nginx
+- `frontend` — SvelteKit app running on port 5142
 - `db` — PostgreSQL 15
 - `nginx` — Reverse proxy routing `/api` traffic to the Rails backend and serving the Svelte SPA for all other routes, eliminating CORS and CSRF complexity
 
 ```
 ├── backend/        # Rails 8 API
-├── frontend/       # Svelte + TypeScript + SCSS
+├── frontend/       # SvelteKit + TypeScript + SCSS
 ├── nginx/          # Nginx config
 └── docker-compose.dev.yml
 ```
