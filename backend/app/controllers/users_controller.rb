@@ -37,23 +37,23 @@ def index
 
   users = users.order("#{sort_column} #{sort_direction}")
 
-  paginated_response(users, EnrichedUserBlueprint)
+  paginated_response(users,  UserBlueprint)
 end
 
 
   def show
-    render json: EnrichedUserBlueprint.render(@user)
+    render json: UserBlueprint.render(@user)
   end
 
   def create
     result = Users::CreateUser.call(params: user_params)
-    render json: EnrichedUserBlueprint.render(result[:user]), status: :created
+    render json: UserBlueprint.render(result[:user]), status: :created
   end
 
 
   def update
     user = Users::UpdateUser.call(user: @user, params: user_params)
-    render json: EnrichedUserBlueprint.render(user)
+    render json: UserBlueprint.render(user)
   end
 
 
@@ -63,13 +63,19 @@ end
   end
 
   def current
-    render json: EnrichedUserBlueprint.render(Current.user)
+    render json: UserBlueprint.render(Current.user)
   end
 
     private
 
       def set_user
-        @user = User.includes(:profile).find(params[:id])
+        @user = User.includes(
+                  :profile,
+                  :contracts,
+                  :active_assignment,
+                  current_contract: { position: :department },
+                  active_assignment: { job: :client }
+                ).find(params[:id])
       end
 
       def user_params

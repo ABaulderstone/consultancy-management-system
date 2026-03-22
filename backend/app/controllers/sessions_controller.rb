@@ -3,12 +3,19 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate_user!, only: :create
 
   def show
-    render json: EnrichedUserBlueprint.render(Current.user)
+    render json: UserBlueprint.render(Current.user)
   end
 
 
   def create
-    user = User.find_by(email: session_params[:email])
+    user = User.includes(
+              :profile,
+              :contracts,
+              :active_assignment,
+              current_contract: { position: :department },
+              active_assignment: { job: :client }
+          ).find_by(email: session_params[:email])
+ 
 
     if user&.authenticate(session_params[:password])
       token = JwtService.encode(user_id: user.id)
@@ -19,7 +26,7 @@ class SessionsController < ApplicationController
         secure: Rails.env.production?,
         same_site: :lax
       }
-      render json: EnrichedUserBlueprint.render(user)
+      render json: UserProfileBlueprint.render(user)
     else
       raise UnauthorizedError, "Invalid credentials"
     end
