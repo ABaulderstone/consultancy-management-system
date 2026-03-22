@@ -5,44 +5,43 @@ class UsersController < ApplicationController
 
 
 
-def index
-    allowed_sort_columns = {
-    'first_name' => 'profiles.first_name',
-    'last_name' => 'profiles.last_name',
-    'email' => 'users.email'
-  }
+  def index
+      allowed_sort_columns = {
+      'first_name' => 'profiles.first_name',
+      'last_name' => 'profiles.last_name',
+      'email' => 'users.email'
+    }
 
-  sort_column = allowed_sort_columns.include?(params[:sort]) ? params[:sort] : 'users.id'
-  sort_direction = %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
+    sort_column = allowed_sort_columns.include?(params[:sort]) ? params[:sort] : 'users.id'
+    sort_direction = %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
 
-  users = User
-    .with_status_select
-    .includes(:profile, :active_assignment, current_contract: { position: :department })
-    .left_joins(:profile)
+    users = User
+      .with_status_select
+      .includes(:profile, :active_assignment, current_contract: { position: :department })
+      .left_joins(:profile)
 
-  users = users.where(role: params[:role]) if params[:role].present?
+    users = users.where(role: params[:role]) if params[:role].present?
 
-  users = case params[:employment_status]
-          when 'active' then users.merge(User.active_employees)
-          when 'departed' then users.merge(User.departed)
-          when 'uncontracted' then users.merge(User.uncontracted)
-          else users
-          end
+    users = case params[:employment_status]
+            when 'active' then users.merge(User.active_employees)
+            when 'departed' then users.merge(User.departed)
+            when 'uncontracted' then users.merge(User.uncontracted)
+            else users
+            end
 
-  users = case params[:assignment_status]
-          when 'assigned' then users.merge(User.assigned)
-          when 'bench' then users.merge(User.on_bench)
-          else users
-          end
+    users = case params[:assignment_status]
+            when 'assigned' then users.merge(User.assigned)
+            when 'bench' then users.merge(User.on_bench)
+            else users
+            end
 
-  users = users.order("#{sort_column} #{sort_direction}")
-
-  paginated_response(users,  UserBlueprint)
-end
+    users = users.order("#{sort_column} #{sort_direction}")
+    paginated_response(users,  UserBlueprint)
+  end
 
 
   def show
-    render json: UserBlueprint.render(@user)
+    render json: UserProfileBlueprint.render(@user)
   end
 
   def create

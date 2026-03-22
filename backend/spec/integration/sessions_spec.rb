@@ -12,7 +12,7 @@ RSpec.describe "Sessions API", type: :request do
       produces "application/json"
 
       response "200", "session found" do
-        schema "$ref" => "#/components/schemas/enriched_user"
+        schema "$ref" => "#/components/schemas/user_profile"
         run_test!
       end
 
@@ -39,7 +39,7 @@ RSpec.describe "Sessions API", type: :request do
 
       response "200", "session created" do
         let(:params) { { email: user.email, password: "password123" } }
-        schema "$ref" => "#/components/schemas/enriched_user"
+        schema "$ref" => "#/components/schemas/user_profile"
         run_test!
       end
 

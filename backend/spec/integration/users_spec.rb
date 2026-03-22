@@ -13,12 +13,18 @@ RSpec.describe "Users API", type: :request do
       security [ { bearerAuth: [] }, { cookieAuth: [] } ]
       produces "application/json"
 
-        parameter name: :page, in: :query, type: :integer, required: false
-        parameter name: :limit, in: :query, type: :integer, required: false
-        parameter name: :sort, in: :query, type: :string, required: false,
-                  enum: %w[first_name last_name email]
-        parameter name: :direction, in: :query, type: :string, required: false,
-                  enum: %w[asc desc]
+      parameter name: :page, in: :query, type: :integer, required: false
+      parameter name: :limit, in: :query, type: :integer, required: false
+      parameter name: :sort, in: :query, type: :string, required: false,
+                enum: %w[first_name last_name email]
+      parameter name: :direction, in: :query, type: :string, required: false,
+                enum: %w[asc desc]
+      parameter name: :role, in: :query, type: :string, required: false,
+                enum: %w[employee admin]
+      parameter name: :employment_status, in: :query, type: :string, required: false,
+                enum: %w[active departed uncontracted]
+      parameter name: :assignment_status, in: :query, type: :string, required: false,
+                enum: %w[assigned bench]
 
       response "200", "users listed" do
         schema "$ref" => "#/components/schemas/paginated_users"
@@ -57,7 +63,7 @@ RSpec.describe "Users API", type: :request do
 
       response "201", "user created" do
         let(:params) { { first_name: "John", last_name: "Smith", date_of_birth: "1990-01-01", gender: "male" } }
-        schema "$ref" => "#/components/schemas/enriched_user"
+        schema "$ref" => "#/components/schemas/user"
         run_test!
       end
 
@@ -93,7 +99,7 @@ RSpec.describe "Users API", type: :request do
 
       response "200", "user found" do
         let(:id) { employee.id }
-        schema "$ref" => "#/components/schemas/enriched_user"
+        schema "$ref" => "#/components/schemas/user_profile"
         run_test!
       end
 
@@ -132,7 +138,7 @@ RSpec.describe "Users API", type: :request do
       response "200", "user updated" do
         let(:id) { employee.id }
         let(:params) { { first_name: "Jane", last_name: "Doe" } }
-        schema "$ref" => "#/components/schemas/enriched_user"
+        schema "$ref" => "#/components/schemas/user_profile"
         run_test!
       end
 
@@ -193,7 +199,7 @@ RSpec.describe "Users API", type: :request do
 
       response "200", "current user returned" do
         let(:Authorization) { "Bearer #{employee_token}" }
-        schema "$ref" => "#/components/schemas/enriched_user"
+        schema "$ref" => "#/components/schemas/user_profile"
         run_test!
       end
 
