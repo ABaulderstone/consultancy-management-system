@@ -1,17 +1,16 @@
 import type { ApiRequestBody } from '../types/api';
-import type { EnrichedUser } from '../types/user';
+import type { UserProfile } from '../types/user';
 import { httpClient } from './client';
 
 interface LoginParams extends ApiRequestBody {
-  email: string;
-  password: string;
+	email: string;
+	password: string;
 }
 
 export const sessionApi = {
-  get: () => httpClient.get<EnrichedUser>('/session'),
+	get: () => httpClient.get<UserProfile>('/session'),
 
-  create: (params: LoginParams) =>
-    httpClient.post<EnrichedUser, LoginParams>('/session', params),
+	create: (params: LoginParams) => httpClient.post<UserProfile, LoginParams>('/session', params),
 
-  destroy: () => httpClient.delete('/session'),
+	destroy: () => httpClient.delete('/session')
 };

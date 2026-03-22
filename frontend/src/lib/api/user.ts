@@ -1,5 +1,5 @@
 import { httpClient } from './client';
-import type { EnrichedUser } from '../types/user';
+import type { User, UserProfile } from '../types/user';
 import type { PaginatedResponse, ApiRequestBody } from '../types/api';
 import type { SortDirection } from '../types/data-table';
 import { toSnakeCase } from '../utils/string';
@@ -29,18 +29,17 @@ export const usersApi = {
 			params.append('sort', toSnakeCase(sort));
 			params.append('direction', direction);
 		}
-		return httpClient.get<PaginatedResponse<EnrichedUser>>(`/users?${params}`);
+		return httpClient.get<PaginatedResponse<User>>(`/users?${params}`);
 	},
 
-	get: (id: number) => httpClient.get<EnrichedUser>(`/users/${id}`),
+	get: (id: number) => httpClient.get<UserProfile>(`/users/${id}`),
 
-	getCurrent: () => httpClient.get<EnrichedUser>('/users/current'),
+	getCurrent: () => httpClient.get<UserProfile>('/users/current'),
 
-	create: (params: CreateUserParams) =>
-		httpClient.post<EnrichedUser, CreateUserParams>('/users', params),
+	create: (params: CreateUserParams) => httpClient.post<User, CreateUserParams>('/users', params),
 
 	update: (id: number, params: UpdateUserParams) =>
-		httpClient.patch<EnrichedUser, UpdateUserParams>(`/users/${id}`, params),
+		httpClient.patch<UserProfile, UpdateUserParams>(`/users/${id}`, params),
 
 	delete: (id: number) => httpClient.delete(`/users/${id}`)
 };

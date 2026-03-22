@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { DataTable } from '$lib/components/ui/DataTable';
-	import type { EnrichedUser } from '$lib/types/user';
+	import type { User } from '$lib/types/user';
+	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import type { ColumnDef, SortDirection, SortState } from '../../../types/data-table';
+	import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 	interface UserTableProps {
-		users: EnrichedUser[];
+		users: User[];
 		sortState?: SortState;
 		onSort?: (key: string, direction: SortDirection) => void;
 		loading?: boolean;
@@ -14,7 +16,8 @@
 
 	let { users, sortState, onSort, loading, fetching, error }: UserTableProps = $props();
 
-	const columns: ColumnDef<EnrichedUser>[] = [
+	const columns: ColumnDef<User>[] = [
+		{ key: 'profile', header: '', cell: profileCell, href: (user) => '/users/' + user.id },
 		{ key: 'firstName', header: 'First Name', cell: firstNameCell, sortable: true },
 		{ key: 'lastName', header: 'Last Name', cell: lastNameCell, sortable: true },
 		{ key: 'email', header: 'Email', cell: emailCell, sortable: true },
@@ -22,19 +25,23 @@
 	];
 </script>
 
-{#snippet firstNameCell(user: EnrichedUser)}
+{#snippet profileCell(user: User)}
+	<FontAwesomeIcon icon={faUser} />
+{/snippet}
+
+{#snippet firstNameCell(user: User)}
 	{user.firstName}
 {/snippet}
 
-{#snippet lastNameCell(user: EnrichedUser)}
+{#snippet lastNameCell(user: User)}
 	{user.lastName}
 {/snippet}
 
-{#snippet emailCell(user: EnrichedUser)}
+{#snippet emailCell(user: User)}
 	{user.email}
 {/snippet}
 
-{#snippet roleCell(user: EnrichedUser)}
+{#snippet roleCell(user: User)}
 	<span class="badge bg-{user.role === 'admin' ? 'danger' : 'secondary'}">
 		{user.role}
 	</span>
