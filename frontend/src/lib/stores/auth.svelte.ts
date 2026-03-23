@@ -1,7 +1,7 @@
-import type { EnrichedUser } from '$lib/types/user';
+import type { UserProfile } from '$lib/types/user';
 
 interface AuthState {
-	user: EnrichedUser | null;
+	user: UserProfile | null;
 	loading: boolean;
 }
 

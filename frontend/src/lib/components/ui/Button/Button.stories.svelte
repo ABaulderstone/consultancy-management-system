@@ -9,7 +9,14 @@
 		argTypes: {
 			variant: {
 				control: 'select',
-				options: ['primary', 'secondary', 'danger', 'outline-primary', 'outline-secondary']
+				options: [
+					'primary',
+					'secondary',
+					'danger',
+					'outline-primary',
+					'outline-secondary',
+					'outline-danger'
+				]
 			},
 			size: {
 				control: 'select',
