@@ -14,6 +14,7 @@
 	import Button from '$lib/components/ui/Button/Button.svelte';
 	import FormRadio from '../../ui/Form/FormRadio.svelte';
 	import type { UpdateUserParams } from '../../../api/user';
+	import { schema, type UserFormData, GENDER_OPTIONS } from './schema';
 
 	interface UserFormProps {
 		mode: 'create' | 'edit';
@@ -21,26 +22,13 @@
 		onSubmit: (data: UserFormData) => Promise<void>;
 	}
 
-	const GENDER_OPTIONS = [
-		{ value: 'male', label: 'Male' },
-		{ value: 'female', label: 'Female' },
-		{ value: 'non_binary', label: 'Non-binary' },
-		{ value: 'prefer_not_to_say', label: 'Prefer not to say' }
-	];
-
 	let { mode, user, onSubmit }: UserFormProps = $props();
 
 	let editing = $state(mode === 'create');
 
-	const schema = z.object({
-		firstName: z.string().min(1, 'First name is required'),
-		lastName: z.string().min(1, 'Last name is required'),
-		title: z.string().optional(),
-		dateOfBirth: z.iso.datetime().optional(),
-		gender: z.enum(Object.keys(GENDER_OPTIONS)).optional()
-	});
+	export type { UserFormData };
 
-	const defaultValues: UpdateUserParams = {
+	const defaultValues: UserFormData = {
 		firstName: user?.firstName ?? '',
 		lastName: user?.lastName ?? '',
 		title: user?.title ?? '',
@@ -51,17 +39,16 @@
 		validators: zod4(schema),
 		SPA: true,
 		onUpdate: async ({ form }) => {
+			console.log('Inside form update');
+			console.log(form.errors);
 			if (!form.valid) return;
 			await handleFormSubmit(
-				form.data as UpdateUserParams,
+				form.data as UserFormData,
 				(field, message) =>
-					errors.update(
-						(current: Record<string, unknown>) =>
-							({
-								...current,
-								[field]: [message]
-							}) as ValidationErrors<UpdateUserParams>
-					),
+					errors.update((current: Record<string, unknown>) => ({
+						...current,
+						[field]: [message]
+					})),
 				formHelpers!,
 				async (data) => {
 					await onSubmit(data);
@@ -74,6 +61,16 @@
 	const { form: formData, errors, submitting } = form;
 
 	let formHelpers = $state<FormHelpers | undefined>(undefined);
+
+	$effect(() => {
+		if (user && !editing) {
+			$formData.firstName = user.firstName ?? '';
+			$formData.lastName = user.lastName ?? '';
+			$formData.title = user.title ?? '';
+			$formData.dateOfBirth = user.dateOfBirth ?? '';
+			$formData.gender = user.gender ?? undefined;
+		}
+	});
 
 	function cancelEdit() {
 		if (user) {

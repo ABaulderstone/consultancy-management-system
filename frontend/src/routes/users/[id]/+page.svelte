@@ -4,10 +4,10 @@
 	import { toast } from 'svelte-sonner';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faUser } from '@fortawesome/free-solid-svg-icons';
-
 	import Card from '$lib/components/ui/Card/Card.svelte';
-	import { usersApi, type UpdateUserParams } from '../../../lib/api/user';
+	import { usersApi } from '../../../lib/api/user';
 	import UserForm from '../../../lib/components/user/UserForm/UserForm.svelte';
+	import type { UserFormData } from '../../../lib/components/user/UserForm/schema';
 
 	const userId = $derived(Number($page.params.id));
 	const queryClient = useQueryClient();
@@ -28,7 +28,8 @@
 		bench: 'warning'
 	};
 
-	async function handleUpdate(data: UpdateUserParams) {
+	async function handleUpdate(data: UserFormData) {
+		console.log('Inside handle update');
 		await usersApi.update(userId, data);
 		queryClient.invalidateQueries({ queryKey: ['users', userId] });
 		toast.success('User updated');
