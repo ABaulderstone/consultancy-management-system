@@ -8,6 +8,10 @@
 	import { usersApi } from '../../../lib/api/user';
 	import UserForm from '../../../lib/components/user/UserForm/UserForm.svelte';
 	import type { UserFormData } from '../../../lib/components/user/UserForm/schema';
+	import Avatar from '../../../lib/components/ui/Avatar';
+	import Badge from '../../../lib/components/ui/Badge';
+	import type { BadgeVariant } from '../../../lib/types/badge';
+	import DetailRow from '../../../lib/components/ui/DetailRow';
 
 	const userId = $derived(Number($page.params.id));
 	const queryClient = useQueryClient();
@@ -17,13 +21,13 @@
 		queryFn: () => usersApi.get(userId)
 	}));
 
-	const employmentStatusVariant: Record<string, string> = {
+	const employmentStatusVariant: Record<string, BadgeVariant> = {
 		active: 'success',
 		departed: 'secondary',
 		uncontracted: 'warning'
 	};
 
-	const assignmentStatusVariant: Record<string, string> = {
+	const assignmentStatusVariant: Record<string, BadgeVariant> = {
 		assigned: 'primary',
 		bench: 'warning'
 	};
@@ -56,25 +60,22 @@
 			<div class="col-lg-4">
 				<Card>
 					<div class="d-flex flex-column align-items-center text-center mb-4">
-						<div
-							class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-3"
-							style="width: 80px; height: 80px;"
-						>
-							<FontAwesomeIcon icon={faUser} class="text-white fa-2x" />
-						</div>
+						<Avatar />
 						<h5 class="mb-1">{user.firstName} {user.lastName}</h5>
 						<p class="text-muted small mb-2">{user.email}</p>
+
 						<div class="d-flex gap-2 flex-wrap justify-content-center">
-							<span class="badge bg-{user.role === 'admin' ? 'danger' : 'secondary'}">
+							<Badge variant={user.role === 'admin' ? 'danger' : 'secondary'}>
 								{user.role}
-							</span>
-							<span class="badge bg-{employmentStatusVariant[user.employmentStatus]}">
+							</Badge>
+
+							<Badge variant={employmentStatusVariant[user.employmentStatus]}>
 								{user.employmentStatus}
-							</span>
+							</Badge>
 							{#if user.assignmentStatus}
-								<span class="badge bg-{assignmentStatusVariant[user.assignmentStatus]}">
+								<Badge variant={assignmentStatusVariant[user.assignmentStatus]}>
 									{user.assignmentStatus}
-								</span>
+								</Badge>
 							{/if}
 						</div>
 					</div>
@@ -91,38 +92,14 @@
 						{#if user.currentContract}
 							{@const contract = user.currentContract}
 							<div class="row g-3">
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Position</p>
-									<p class="mb-0 fw-medium">{contract.position.title}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Department</p>
-									<p class="mb-0 fw-medium">{contract.position.department}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Contract Type</p>
-									<p class="mb-0 fw-medium">{contract.contractType.replace('_', ' ')}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">FTE</p>
-									<p class="mb-0 fw-medium">{contract.fte ?? '—'}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Annual Rate</p>
-									<p class="mb-0 fw-medium">${contract.rate.toLocaleString()}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Payable Rate</p>
-									<p class="mb-0 fw-medium">${contract.payableRate.toLocaleString()}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Daily Cost</p>
-									<p class="mb-0 fw-medium">${contract.dailyCost.toLocaleString()}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Start Date</p>
-									<p class="mb-0 fw-medium">{contract.startDate}</p>
-								</div>
+								<DetailRow label="Position" value={contract.position.title} />
+								<DetailRow label="Department" value={contract.position.department} />
+								<DetailRow label="Contract Type" value={contract.contractType.replace('_', ' ')} />
+								<DetailRow label="FTE" value={contract.fte} />
+								<DetailRow label="Annual Rate" value="${contract.rate.toLocaleString()}" />
+								<DetailRow label="Payable Rate" value="${contract.payableRate.toLocaleString()}" />
+								<DetailRow label="Daily Cost" value="${contract.dailyCost.toLocaleString()}" />
+								<DetailRow label="Start Date" value={contract.startDate} />
 							</div>
 						{:else}
 							<p class="text-muted mb-0">No active contract</p>
@@ -141,27 +118,22 @@
 
 						{#if user.currentJob}
 							{@const job = user.currentJob}
+							{@const marginClass =
+								job.dailyMargin > 200
+									? 'text-success'
+									: job.dailyMargin > 100
+										? 'text-warning'
+										: 'text-danger'}
 							<div class="row g-3">
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Title</p>
-									<p class="mb-0 fw-medium">{job.title}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Client</p>
-									<p class="mb-0 fw-medium">{job.client}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Day Rate</p>
-									<p class="mb-0 fw-medium">${job.dayRate.toLocaleString()}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Daily Margin</p>
-									<p class="mb-0 fw-medium text-success">${job.dailyMargin.toLocaleString()}</p>
-								</div>
-								<div class="col-sm-6">
-									<p class="text-muted small mb-1">Start Date</p>
-									<p class="mb-0 fw-medium">{job.startDate}</p>
-								</div>
+								<DetailRow label="Title" value={job.title} />
+								<DetailRow label="Client" value={job.client} />
+								<DetailRow label="Day Rate" value="${job.dayRate.toLocaleString()}" />
+								<DetailRow
+									label="Daily Margin"
+									valueClass={marginClass}
+									value="${job.dailyMargin.toLocaleString()}"
+								/>
+								<DetailRow label="Start Date" value={job.startDate} />
 							</div>
 						{:else}
 							<p class="text-muted mb-0">

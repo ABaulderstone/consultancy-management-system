@@ -4,6 +4,7 @@
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import type { ColumnDef, SortDirection, SortState } from '../../../types/data-table';
 	import { faUser } from '@fortawesome/free-solid-svg-icons';
+	import Badge from '../../ui/Badge';
 
 	interface UserTableProps {
 		users: User[];
@@ -42,9 +43,9 @@
 {/snippet}
 
 {#snippet roleCell(user: User)}
-	<span class="badge bg-{user.role === 'admin' ? 'danger' : 'secondary'}">
+	<Badge variant={user.role === 'admin' ? 'danger' : 'secondary'}>
 		{user.role}
-	</span>
+	</Badge>
 {/snippet}
 
 <DataTable {columns} rows={users} {sortState} {onSort} {loading} {fetching} {error} />
