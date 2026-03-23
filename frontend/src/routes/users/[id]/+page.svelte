@@ -33,7 +33,6 @@
 	};
 
 	async function handleUpdate(data: UserFormData) {
-		console.log('Inside handle update');
 		await usersApi.update(userId, data);
 		queryClient.invalidateQueries({ queryKey: ['users', userId] });
 		toast.success('User updated');
