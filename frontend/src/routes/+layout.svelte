@@ -7,7 +7,6 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { resolve } from '$app/paths';
 
 	import type { Snippet } from 'svelte';
 	import { sessionApi } from '$lib/api/session';
@@ -22,6 +21,10 @@
 	let { children }: { children: Snippet } = $props();
 
 	const PUBLIC_ROUTES = ['/login'];
+	const HOME_ROUTE = {
+		employee: 'employee/dashboard',
+		admin: 'admin/dashboard'
+	};
 
 	onMount(async () => {
 		try {
@@ -40,10 +43,10 @@
 	$effect(() => {
 		if (authStore.loading) return;
 		if (!authStore.user && !isPublic) {
-			goto(resolve('/login'));
+			goto('/login');
 			toast.error('You need to be logged in to do that');
-		} else if (authStore.user && isPublic) {
-			goto(resolve('/'));
+		} else if (authStore.user && (isPublic || page.url.pathname === '/')) {
+			goto(HOME_ROUTE[authStore.user.role]);
 		}
 	});
 </script>
