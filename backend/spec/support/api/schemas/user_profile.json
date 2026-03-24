@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "email", "role", "employment_status"],
+  "properties": {
+    "id": { "type": "integer" },
+    "email": { "type": "string" },
+    "role": { "type": "string", "enum": ["employee", "admin"] },
+    "first_name": { "type": ["string", "null"] },
+    "last_name": { "type": ["string", "null"] },
+    "title": { "type": ["string", "null"] },
+    "gender": { "type": ["string", "null"] },
+    "date_of_birth": { "type": ["string", "null"] },
+    "employment_status": {
+      "type": "string",
+      "enum": ["active", "departed", "uncontracted"]
+    },
+    "assignment_status": {
+      "type": ["string", "null"],
+      "enum": ["assigned", "bench", null]
+    },
+    "lifetime_utilisation": { "type": "number" },
+    "current_contract": {
+      "type": ["object", "null"],
+      "properties": {
+        "contract_type": {
+          "type": "string",
+          "enum": ["full_time", "part_time", "contractor"]
+        },
+        "rate": { "type": "number" },
+        "payable_rate": { "type": "number" },
+        "daily_cost": { "type": "number" },
+        "fte": { "type": ["number", "null"] },
+        "start_date": { "type": "string" },
+        "position": {
+          "type": "object",
+          "properties": {
+            "title": { "type": ["string", "null"] },
+            "department": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "current_job": {
+      "type": ["object", "null"],
+      "properties": {
+        "title": { "type": "string" },
+        "client": { "type": "string" },
+        "start_date": { "type": "string" },
+        "day_rate": { "type": "number" },
+        "daily_margin": { "type": "number" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

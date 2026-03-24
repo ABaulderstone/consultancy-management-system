@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "id",
+    "contract_type",
+    "rate",
+    "payable_rate",
+    "daily_cost",
+    "start_date"
+  ],
+  "properties": {
+    "id": { "type": "integer" },
+    "contract_type": {
+      "type": "string",
+      "enum": ["full_time", "part_time", "contractor"]
+    },
+    "rate": { "type": "number" },
+    "payable_rate": { "type": "number" },
+    "daily_cost": { "type": "number" },
+    "fte": { "type": ["number", "null"] },
+    "start_date": { "type": "string" },
+    "end_date": { "type": ["string", "null"] },
+    "position": {
+      "type": "object",
+      "properties": {
+        "title": { "type": ["string", "null"] },
+        "department": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

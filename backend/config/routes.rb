@@ -1,10 +1,16 @@
 Rails.application.routes.draw do
   if Rails.env.development?
-    mount Rswag::Api::Engine => '/api-docs'
-    mount Rswag::Ui::Engine => '/api-docs'
+    mount Rswag::Api::Engine => "/api-docs"
+    mount Rswag::Ui::Engine => "/api-docs"
   end
   get "users/current"
-  resources :users
+
+  resources :users do
+    member do
+      get :contracts
+      get :assignments
+    end
+  end
   resource :session, only: [ :show, :create, :destroy ]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

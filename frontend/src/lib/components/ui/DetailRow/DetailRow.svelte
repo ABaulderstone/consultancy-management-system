@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { string } from 'zod';
 
-	interface Props {
+	interface DetailRowProps {
 		label: string;
 		value: string | number | null | undefined;
 		col?: string;
@@ -9,7 +9,7 @@
 		valueClass?: string;
 	}
 
-	let { label, value, col = 'col-sm-6', labelClass = '', valueClass = '' }: Props = $props();
+	let { label, value, col = 'col-sm-6', labelClass = '', valueClass = '' }: DetailRowProps = $props();
 </script>
 
 <div class={col}>

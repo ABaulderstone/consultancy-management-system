@@ -6,11 +6,12 @@ RSpec.describe "Users", type: :request do
 
   describe "GET /users" do
     it "debug" do
-  get "/users"
-  puts Rails.env
-  puts response.status
-  puts response.body
-end
+    get "/users"
+    puts Rails.env
+    puts response.status
+    puts response.body
+  end
+
     context "when admin" do
       let(:headers) { auth_headers(admin) }
 
@@ -21,9 +22,9 @@ end
         expect(response).to match_response_schema("paginated_response")
       end
 
-      it "returns enriched user schema for each record" do
+      it "returns user schema for each record" do
         get "/users", headers: headers
-        expect(json_response["data"].first).to match_response_schema("enriched_user")
+        expect(json_response["data"].first).to match_response_schema("user")
       end
 
       it "returns paginated response" do
@@ -33,9 +34,9 @@ end
         expect(response).to match_response_schema("paginated_response")
       end
 
-      it "returns enriched user schema for each record" do
+      it "returns user schema for each record" do
         get "/users", headers: headers
-        expect(json_response["data"].first).to match_response_schema("enriched_user")
+        expect(json_response["data"].first).to match_response_schema("user")
       end
 
       context "with sort params" do
@@ -59,7 +60,6 @@ end
           expect(response).to have_http_status(:ok)
           expect(json_response["data"].first["first_name"]).to eq("Zara")
           expect(json_response["data"].last["first_name"]).to eq("Aaron")
-
         end
 
         it "ignores invalid sort column and defaults to id" do
@@ -71,9 +71,7 @@ end
           get "/users", params: { sort: "first_name", direction: "invalid" }, headers: headers
           expect(response).to have_http_status(:ok)
         end
-  end
-
-
+      end
     end
 
 
@@ -100,20 +98,20 @@ end
     context "when admin" do
       let(:headers) { auth_headers(admin) }
 
-      it "returns enriched user schema" do
+      it "returns user profile schema" do
         get "/users/#{employee.id}", headers: headers
         expect(response).to have_http_status(:ok)
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user_profile")
       end
     end
 
     context "when same user" do
       let(:headers) { auth_headers(employee) }
 
-      it "returns enriched user schema" do
+      it "returns user profile schema" do
         get "/users/#{employee.id}", headers: headers
         expect(response).to have_http_status(:ok)
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user_profile")
       end
     end
 
@@ -154,10 +152,10 @@ end
         expect { post "/users", params: params, headers: headers }.to change(User, :count).by(1)
       end
 
-      it "returns enriched user schema" do
+      it "returns user profile schema" do
         post "/users", params: params, headers: headers
         expect(response).to have_http_status(:created)
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user_profile")
       end
     end
 
@@ -202,19 +200,19 @@ end
         expect(employee.profile.reload.first_name).to eq("Jane")
       end
 
-      it "returns enriched user schema" do
+      it "returns user profile schema" do
         patch "/users/#{employee.id}", params: params, headers: headers
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user_profile")
       end
     end
 
     context "when same user" do
       let(:headers) { auth_headers(employee) }
 
-      it "returns enriched user schema" do
+      it "returns user profile schema" do
         patch "/users/#{employee.id}", params: params, headers: headers
         expect(response).to have_http_status(:ok)
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user_profile")
       end
     end
 
@@ -289,9 +287,9 @@ end
         expect(response).to have_http_status(:ok)
       end
 
-      it "returns enriched user schema" do
+      it "returns  user schema" do
         get "/users/current", headers: headers
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user")
       end
     end
 
@@ -304,6 +302,103 @@ end
       it "returns error schema" do
         get "/users/current"
         expect(response).to match_response_schema("error")
+      end
+    end
+  end
+  describe "GET /users/:id/contracts" do
+  context "when admin" do
+    let(:headers) { auth_headers(admin) }
+    let(:nonexistent_id) { User.maximum(:id) + 1 }
+
+    it "returns contracts for the user" do
+      create(:contract, user: employee)
+      get "/users/#{employee.id}/contracts", headers: headers
+      expect(response).to have_http_status(:ok)
+      expect(json_response).to be_an(Array)
+    end
+
+    it "returns contracts in descending order by start date" do
+      older = create(:contract, user: employee, start_date: Date.today - 2.years, end_date: Date.today - 1.year)
+      newer = create(:contract, user: employee, start_date: Date.today - 6.months, end_date: nil)
+      get "/users/#{employee.id}/contracts", headers: headers
+      expect(json_response.first["id"]).to eq(newer.id)
+      expect(json_response.last["id"]).to eq(older.id)
+    end
+
+    it "returns contract schema for each record" do
+      create(:contract, user: employee)
+      get "/users/#{employee.id}/contracts", headers: headers
+      expect(json_response.first).to match_response_schema("contract")
+    end
+
+    it "returns 404 for non existent user" do
+      get "/users/#{nonexistent_id}/contracts", headers: headers
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  context "when employee" do
+    let(:headers) { auth_headers(employee) }
+
+    it "returns forbidden" do
+      get "/users/#{employee.id}/contracts", headers: headers
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  context "when unauthenticated" do
+    it "returns unauthorized" do
+      get "/users/#{employee.id}/contracts"
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+end
+
+  describe "GET /users/:id/assignments" do
+    context "when admin" do
+      let(:headers) { auth_headers(admin) }
+      let(:nonexistent_id) { User.maximum(:id) + 1 }
+
+      it "returns assignments for the user" do
+        create(:assignment, user: employee)
+        get "/users/#{employee.id}/assignments", headers: headers
+        expect(response).to have_http_status(:ok)
+        expect(json_response).to be_an(Array)
+      end
+
+      it "returns assignments in descending order by start date" do
+        older = create(:assignment, user: employee, start_date: Date.today - 2.years, end_date: Date.today - 1.year)
+        newer = create(:assignment, user: employee, start_date: Date.today - 6.months, end_date: nil)
+        get "/users/#{employee.id}/assignments", headers: headers
+        expect(json_response.first["id"]).to eq(newer.id)
+        expect(json_response.last["id"]).to eq(older.id)
+      end
+
+      it "returns assignment schema for each record" do
+        create(:assignment, user: employee)
+        get "/users/#{employee.id}/assignments", headers: headers
+        expect(json_response.first).to match_response_schema("assignment")
+      end
+
+      it "returns 404 for non existent user" do
+        get "/users/#{nonexistent_id}/assignments", headers: headers
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when employee" do
+      let(:headers) { auth_headers(employee) }
+
+      it "returns forbidden" do
+        get "/users/#{employee.id}/assignments", headers: headers
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "when unauthenticated" do
+      it "returns unauthorized" do
+        get "/users/#{employee.id}/assignments"
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

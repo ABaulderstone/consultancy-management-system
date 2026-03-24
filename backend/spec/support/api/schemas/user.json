@@ -1,9 +1,24 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["id", "email", "role"],
+  "required": ["id", "email", "role", "employment_status"],
   "properties": {
     "id": { "type": "integer" },
     "email": { "type": "string" },
-    "role": { "type": "string" }
-  }
+    "role": { "type": "string", "enum": ["employee", "admin"] },
+    "first_name": { "type": ["string", "null"] },
+    "last_name": { "type": ["string", "null"] },
+    "title": { "type": ["string", "null"] },
+    "gender": { "type": ["string", "null"] },
+    "date_of_birth": { "type": ["string", "null"] },
+    "employment_status": {
+      "type": "string",
+      "enum": ["active", "departed", "uncontracted"]
+    },
+    "assignment_status": {
+      "type": ["string", "null"],
+      "enum": ["assigned", "bench", null]
+    }
+  },
+  "additionalProperties": false
 }

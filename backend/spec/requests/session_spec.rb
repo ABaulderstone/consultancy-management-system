@@ -9,10 +9,10 @@ RSpec.describe "Sessions", type: :request do
 
 
 
-      it "returns enriched user schema" do
+      it "returns user profile schema" do
         get "/session", headers: headers
         expect(response).to have_http_status(:ok)
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user_profile")
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe "Sessions", type: :request do
       it "returns enriched user schema" do
         post "/session", params: { email: user.email, password: "password123" }
         expect(response).to have_http_status(:ok)
-        expect(response).to match_response_schema("enriched_user")
+        expect(response).to match_response_schema("user_profile")
       end
 
       it "sets a jwt cookie" do
