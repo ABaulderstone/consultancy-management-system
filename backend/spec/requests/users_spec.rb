@@ -5,13 +5,6 @@ RSpec.describe "Users", type: :request do
   let!(:employee) { create(:user) }
 
   describe "GET /users" do
-    it "debug" do
-    get "/users"
-    puts Rails.env
-    puts response.status
-    puts response.body
-  end
-
     context "when admin" do
       let(:headers) { auth_headers(admin) }
 
@@ -94,12 +87,12 @@ RSpec.describe "Users", type: :request do
     end
   end
 
-  describe "GET /users/:id" do
+  describe "GET /users/:slug" do
     context "when admin" do
       let(:headers) { auth_headers(admin) }
 
       it "returns user profile schema" do
-        get "/users/#{employee.id}", headers: headers
+        get "/users/#{employee.profile.slug}", headers: headers
         expect(response).to have_http_status(:ok)
         expect(response).to match_response_schema("user_profile")
       end
@@ -109,7 +102,7 @@ RSpec.describe "Users", type: :request do
       let(:headers) { auth_headers(employee) }
 
       it "returns user profile schema" do
-        get "/users/#{employee.id}", headers: headers
+        get "/users/#{employee.profile.slug}", headers: headers
         expect(response).to have_http_status(:ok)
         expect(response).to match_response_schema("user_profile")
       end
@@ -120,7 +113,7 @@ RSpec.describe "Users", type: :request do
       let(:headers) { auth_headers(employee) }
 
       it "returns error schema" do
-        get "/users/#{other.id}", headers: headers
+        get "/users/#{other.profile.slug}", headers: headers
         expect(response).to have_http_status(:forbidden)
         expect(response).to match_response_schema("error")
       end
@@ -128,7 +121,7 @@ RSpec.describe "Users", type: :request do
 
     context "when unauthenticated" do
       it "returns error schema" do
-        get "/users/#{employee.id}"
+        get "/users/#{employee.profile.slug}"
         expect(response).to have_http_status(:unauthorized)
         expect(response).to match_response_schema("error")
       end
@@ -155,7 +148,7 @@ RSpec.describe "Users", type: :request do
       it "returns user profile schema" do
         post "/users", params: params, headers: headers
         expect(response).to have_http_status(:created)
-        expect(response).to match_response_schema("user_profile")
+        expect(response).to match_response_schema("user")
       end
     end
 
@@ -188,21 +181,21 @@ RSpec.describe "Users", type: :request do
     end
   end
 
-  describe "PATCH /users/:id" do
+  describe "PATCH /users/:slug" do
     let(:params) { { first_name: "Jane", last_name: "Doe" } }
 
     context "when admin" do
       let(:headers) { auth_headers(admin) }
 
       it "updates the user" do
-        patch "/users/#{employee.id}", params: params, headers: headers
+        patch "/users/#{employee.profile.slug}", params: params, headers: headers
         expect(response).to have_http_status(:ok)
         expect(employee.profile.reload.first_name).to eq("Jane")
       end
 
       it "returns user profile schema" do
-        patch "/users/#{employee.id}", params: params, headers: headers
-        expect(response).to match_response_schema("user_profile")
+        patch "/users/#{employee.profile.slug}", params: params, headers: headers
+        expect(response).to match_response_schema("user")
       end
     end
 
@@ -210,9 +203,9 @@ RSpec.describe "Users", type: :request do
       let(:headers) { auth_headers(employee) }
 
       it "returns user profile schema" do
-        patch "/users/#{employee.id}", params: params, headers: headers
+        patch "/users/#{employee.profile.slug}", params: params, headers: headers
         expect(response).to have_http_status(:ok)
-        expect(response).to match_response_schema("user_profile")
+        expect(response).to match_response_schema("user")
       end
     end
 
@@ -221,7 +214,7 @@ RSpec.describe "Users", type: :request do
       let(:headers) { auth_headers(employee) }
 
       it "returns error schema" do
-        patch "/users/#{other.id}", params: params, headers: headers
+        patch "/users/#{other.profile.slug}", params: params, headers: headers
         expect(response).to have_http_status(:forbidden)
         expect(response).to match_response_schema("error")
       end
@@ -231,7 +224,7 @@ RSpec.describe "Users", type: :request do
       let(:headers) { auth_headers(admin) }
 
       it "returns error schema" do
-        patch "/users/#{employee.id}", params: { first_name: nil, last_name: nil }, headers: headers
+        patch "/users/#{employee.profile.slug}", params: { first_name: nil, last_name: nil }, headers: headers
         expect(response).to have_http_status(:unprocessable_content)
         expect(response).to match_response_schema("error")
         expect(json_response["details"]).to be_present
@@ -240,22 +233,22 @@ RSpec.describe "Users", type: :request do
 
     context "when unauthenticated" do
       it "returns unauthorized" do
-        patch "/users/#{employee.id}", params: params
+        patch "/users/#{employee.profile.slug}", params: params
         expect(response).to have_http_status(:unauthorized)
       end
     end
   end
 
-  describe "DELETE /users/:id" do
+  describe "DELETE /users/:slug" do
     context "when admin" do
       let(:headers) { auth_headers(admin) }
 
       it "deletes the user" do
-        expect { delete "/users/#{employee.id}", headers: headers }.to change(User, :count).by(-1)
+        expect { delete "/users/#{employee.profile.slug}", headers: headers }.to change(User, :count).by(-1)
       end
 
       it "returns no content" do
-        delete "/users/#{employee.id}", headers: headers
+        delete "/users/#{employee.profile.slug}", headers: headers
         expect(response).to have_http_status(:no_content)
       end
     end
@@ -264,7 +257,7 @@ RSpec.describe "Users", type: :request do
       let(:headers) { auth_headers(employee) }
 
       it "returns error schema" do
-        delete "/users/#{employee.id}", headers: headers
+        delete "/users/#{employee.profile.slug}", headers: headers
         expect(response).to have_http_status(:forbidden)
         expect(response).to match_response_schema("error")
       end
@@ -305,14 +298,14 @@ RSpec.describe "Users", type: :request do
       end
     end
   end
-  describe "GET /users/:id/contracts" do
+  describe "GET /users/:slug/contracts" do
   context "when admin" do
     let(:headers) { auth_headers(admin) }
-    let(:nonexistent_id) { User.maximum(:id) + 1 }
+    let(:nonexistent_slug) { "sdfasdfagdagag" }
 
     it "returns contracts for the user" do
       create(:contract, user: employee)
-      get "/users/#{employee.id}/contracts", headers: headers
+      get "/users/#{employee.profile.slug}/contracts", headers: headers
       expect(response).to have_http_status(:ok)
       expect(json_response).to be_an(Array)
     end
@@ -320,19 +313,19 @@ RSpec.describe "Users", type: :request do
     it "returns contracts in descending order by start date" do
       older = create(:contract, user: employee, start_date: Date.today - 2.years, end_date: Date.today - 1.year)
       newer = create(:contract, user: employee, start_date: Date.today - 6.months, end_date: nil)
-      get "/users/#{employee.id}/contracts", headers: headers
+      get "/users/#{employee.profile.slug}/contracts", headers: headers
       expect(json_response.first["id"]).to eq(newer.id)
       expect(json_response.last["id"]).to eq(older.id)
     end
 
     it "returns contract schema for each record" do
       create(:contract, user: employee)
-      get "/users/#{employee.id}/contracts", headers: headers
+      get "/users/#{employee.profile.slug}/contracts", headers: headers
       expect(json_response.first).to match_response_schema("contract")
     end
 
     it "returns 404 for non existent user" do
-      get "/users/#{nonexistent_id}/contracts", headers: headers
+      get "/users/#{nonexistent_slug}/contracts", headers: headers
       expect(response).to have_http_status(:not_found)
     end
   end
@@ -341,27 +334,27 @@ RSpec.describe "Users", type: :request do
     let(:headers) { auth_headers(employee) }
 
     it "returns forbidden" do
-      get "/users/#{employee.id}/contracts", headers: headers
+      get "/users/#{employee.profile.slug}/contracts", headers: headers
       expect(response).to have_http_status(:forbidden)
     end
   end
 
   context "when unauthenticated" do
     it "returns unauthorized" do
-      get "/users/#{employee.id}/contracts"
+      get "/users/#{employee.profile.slug}/contracts"
       expect(response).to have_http_status(:unauthorized)
     end
   end
 end
 
-  describe "GET /users/:id/assignments" do
+  describe "GET /users/:slug/assignments" do
     context "when admin" do
       let(:headers) { auth_headers(admin) }
-      let(:nonexistent_id) { User.maximum(:id) + 1 }
+      let(:nonexistent_slug) { "sdfasdfasdfadf" }
 
       it "returns assignments for the user" do
         create(:assignment, user: employee)
-        get "/users/#{employee.id}/assignments", headers: headers
+        get "/users/#{employee.profile.slug}/assignments", headers: headers
         expect(response).to have_http_status(:ok)
         expect(json_response).to be_an(Array)
       end
@@ -369,19 +362,19 @@ end
       it "returns assignments in descending order by start date" do
         older = create(:assignment, user: employee, start_date: Date.today - 2.years, end_date: Date.today - 1.year)
         newer = create(:assignment, user: employee, start_date: Date.today - 6.months, end_date: nil)
-        get "/users/#{employee.id}/assignments", headers: headers
+        get "/users/#{employee.profile.slug}/assignments", headers: headers
         expect(json_response.first["id"]).to eq(newer.id)
         expect(json_response.last["id"]).to eq(older.id)
       end
 
       it "returns assignment schema for each record" do
         create(:assignment, user: employee)
-        get "/users/#{employee.id}/assignments", headers: headers
+        get "/users/#{employee.profile.slug}/assignments", headers: headers
         expect(json_response.first).to match_response_schema("assignment")
       end
 
       it "returns 404 for non existent user" do
-        get "/users/#{nonexistent_id}/assignments", headers: headers
+        get "/users/#{nonexistent_slug}/assignments", headers: headers
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -390,14 +383,14 @@ end
       let(:headers) { auth_headers(employee) }
 
       it "returns forbidden" do
-        get "/users/#{employee.id}/assignments", headers: headers
+        get "/users/#{employee.profile.slug}/assignments", headers: headers
         expect(response).to have_http_status(:forbidden)
       end
     end
 
     context "when unauthenticated" do
       it "returns unauthorized" do
-        get "/users/#{employee.id}/assignments"
+        get "/users/#{employee.profile.slug}/assignments"
         expect(response).to have_http_status(:unauthorized)
       end
     end

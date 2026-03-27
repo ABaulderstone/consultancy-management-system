@@ -1,4 +1,12 @@
 class Profile < ApplicationRecord
+
+  def self.find_user_id_by_slug_or_history(slug)
+    user_id = where(slug: slug).pick(:user_id)
+    return user_id if user_id
+
+    SlugHistory.active.where(slug: slug).pick(:user_id)
+  end
+  
   belongs_to :user
   validates :first_name, :last_name, presence: true
   validate :date_of_birth_format

@@ -14,14 +14,7 @@ module Authentication
       payload = JwtService.decode(token)
       return unauthorized! unless payload
 
-      user = User.includes(
-                    :profile,
-                    :contracts,
-                    :active_assignment,
-                    current_contract: { position: :department },
-                    active_assignment: { job: :client }
-                ).find_by(id: payload["user_id"])
-      return unauthorized! unless user
+      user = User.find(payload["user_id"])
 
       Current.user = user
     end

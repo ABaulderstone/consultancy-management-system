@@ -8,14 +8,8 @@ class SessionsController < ApplicationController
 
 
   def create
-    user = User.includes(
-              :profile,
-              :contracts,
-              :active_assignment,
-              current_contract: { position: :department },
-              active_assignment: { job: :client }
-          ).find_by(email: session_params[:email])
- 
+    user = User.find_by_email(session_params[:email])
+
 
     if user&.authenticate(session_params[:password])
       token = JwtService.encode(user_id: user.id)
@@ -26,7 +20,7 @@ class SessionsController < ApplicationController
         secure: Rails.env.production?,
         same_site: :lax
       }
-      render json: UserProfileBlueprint.render(user)
+      render json: UserBlueprint.render(user)
     else
       raise UnauthorizedError, "Invalid credentials"
     end

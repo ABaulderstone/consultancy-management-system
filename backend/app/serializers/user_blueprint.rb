@@ -22,6 +22,10 @@ class UserBlueprint < Blueprinter::Base
     user.profile&.date_of_birth
   end
 
+  field :slug do |user, _|
+    user.profile&.slug
+  end
+
   field :employment_status do |user, _|
     if user[:has_active_contract]
       'active'

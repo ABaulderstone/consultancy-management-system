@@ -6,8 +6,7 @@ class CreateSlugHistories < ActiveRecord::Migration[8.1]
       t.datetime :expires_at, null: false
 
       t.timestamps
-
-      add_index :slug_histories, [:slug, :expires_at]
+      t.index [:slug, :expires_at]
     end
   end
 end

@@ -10,6 +10,7 @@
     "last_name": { "type": ["string", "null"] },
     "title": { "type": ["string", "null"] },
     "gender": { "type": ["string", "null"] },
+    "slug": { "type": "string" },
     "date_of_birth": { "type": ["string", "null"] },
     "employment_status": {
       "type": "string",

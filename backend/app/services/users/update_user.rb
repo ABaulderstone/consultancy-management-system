@@ -1,5 +1,6 @@
 class Users::UpdateUser < ApplicationService
   include Users::EmailGeneratable
+  include Users::Sluggable
   def initialize(user:, params:)
     @user = user
     @params = params
@@ -7,14 +8,14 @@ class Users::UpdateUser < ApplicationService
 
   def call
     ActiveRecord::Base.transaction do
-      email_needs_update = name_changed?
-
-      @user.profile.update!(profile_params)
-
-      if email_needs_update
+      if name_changed?
+        # doubling logic to force invalid params error if needed
+        @user.profile.update!(profile_params)
         @user.update!(email: generate_email(@user.id, @params[:first_name], @params[:last_name]))
+        update_slug!(@user.profile)
+      else
+        @user.profile.update!(profile_params)
       end
-
       @user
     end
   end

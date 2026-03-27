@@ -89,8 +89,8 @@ RSpec.describe "Users API", type: :request do
     end
   end
 
-  path "/users/{id}" do
-    parameter name: :id, in: :path, type: :integer
+  path "/users/{slug}" do
+    parameter name: :slug, in: :path, type: :string
 
     get "Get a user" do
       tags "Users"
@@ -98,21 +98,21 @@ RSpec.describe "Users API", type: :request do
       produces "application/json"
 
       response "200", "user found" do
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         schema "$ref" => "#/components/schemas/user_profile"
         run_test!
       end
 
       response "401", "unauthorized" do
         let(:Authorization) { nil }
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         schema "$ref" => "#/components/schemas/error"
         run_test!
       end
 
       response "403", "forbidden" do
         let(:Authorization) { "Bearer #{employee_token}" }
-        let(:id) { create(:user).id }
+        let(:slug) { create(:user).profile.slug }
         schema "$ref" => "#/components/schemas/error"
         run_test!
       end
@@ -136,7 +136,7 @@ RSpec.describe "Users API", type: :request do
       }
 
       response "200", "user updated" do
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         let(:params) { { first_name: "Jane", last_name: "Doe" } }
         schema "$ref" => "#/components/schemas/user_profile"
         run_test!
@@ -144,7 +144,7 @@ RSpec.describe "Users API", type: :request do
 
       response "401", "unauthorized" do
         let(:Authorization) { nil }
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         let(:params) { { first_name: "Jane" } }
         schema "$ref" => "#/components/schemas/error"
         run_test!
@@ -152,14 +152,14 @@ RSpec.describe "Users API", type: :request do
 
       response "403", "forbidden" do
         let(:Authorization) { "Bearer #{employee_token}" }
-        let(:id) { create(:user).id }
+        let(:slug) { create(:user).profile.slug }
         let(:params) { { first_name: "Jane" } }
         schema "$ref" => "#/components/schemas/error"
         run_test!
       end
 
       response "422", "validation failed" do
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         let(:params) { { first_name: nil, last_name: nil } }
         schema "$ref" => "#/components/schemas/error"
         run_test!
@@ -171,20 +171,20 @@ RSpec.describe "Users API", type: :request do
       security [ { bearerAuth: [] }, { cookieAuth: [] } ]
 
       response "204", "user deleted" do
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         run_test!
       end
 
       response "401", "unauthorized" do
         let(:Authorization) { nil }
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         schema "$ref" => "#/components/schemas/error"
         run_test!
       end
 
       response "403", "forbidden" do
         let(:Authorization) { "Bearer #{employee_token}" }
-        let(:id) { employee.id }
+        let(:slug) { employee.profile.slug }
         schema "$ref" => "#/components/schemas/error"
         run_test!
       end

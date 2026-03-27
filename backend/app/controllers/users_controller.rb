@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: [ :show, :update, :destroy ]
   before_action :only_admin!, only: [ :destroy, :create, :index, :contracts, :assignments ]
   before_action :authorize_admin_or_self!, only: [ :show, :update ]
-  before_action :set_user_id, only: [:assignments, :contracts]
+  before_action :set_user_id, only: [ :assignments, :contracts ]
 
 
 
@@ -54,9 +54,9 @@ class UsersController < ApplicationController
   end
 
   def assignments
-    Assignment.where(user_id: @user_id)
-     .includes(job: :client)
-     .order(start_date: :desc)
+    assignments = Assignment.where(user_id: @user_id)
+      .includes(job: :client)
+      .order(start_date: :desc)
     render json: AssignmentBlueprint.render(assignments)
   end
 

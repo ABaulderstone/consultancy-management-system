@@ -6,5 +6,6 @@ FactoryBot.define do
     gender { Profile.genders.keys.sample }
     date_of_birth { Faker::Date.birthday(min_age: 22, max_age: 65) }
     association :user
+    sequence(:slug) { |n| "#{first_name.parameterize}-#{last_name.parameterize}-#{n}" }
   end
 end
