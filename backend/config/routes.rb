@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   end
   get "users/current"
 
-  resources :users do
+  resources :users, param: :slug do
     member do
       get :contracts
       get :assignments

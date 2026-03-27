@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: [ :show, :update, :destroy ]
   before_action :only_admin!, only: [ :destroy, :create, :index, :contracts, :assignments ]
   before_action :authorize_admin_or_self!, only: [ :show, :update ]
+  before_action :set_user_id, only: [:assignments, :contracts]
 
 
 
@@ -45,14 +46,15 @@ class UsersController < ApplicationController
   end
 
   def contracts
-    user = User.find(params[:id])
-    contracts = user.contracts.includes(position: :department).order(start_date: :desc)
+    contracts = Contract
+      .where(user_id: @user_id)
+      .includes(position: :department)
+      .order(start_date: :desc)
     render json: ContractBlueprint.render(contracts)
   end
 
   def assignments
-    user = User.find(params[:id])
-    assignments = user.assignments
+    Assignment.where(user_id: @user_id)
      .includes(job: :client)
      .order(start_date: :desc)
     render json: AssignmentBlueprint.render(assignments)
@@ -82,13 +84,21 @@ class UsersController < ApplicationController
     private
 
       def set_user
+        user_id = Profile.find_user_id_by_slug_or_history(params[:slug])
+        raise ActiveRecord::RecordNotFound unless user_id
         @user = User.includes(
                   :profile,
                   :contracts,
                   :active_assignment,
                   current_contract: { position: :department },
                   active_assignment: { job: :client }
-                ).find(params[:id])
+                ).find(user_id)
+      end
+
+      def set_user_id
+        user_id = Profile.find_user_id_by_slug_or_history(params[:slug])
+        raise ActiveRecord::RecordNotFound unless user_id
+        @user_id = user_id
       end
 
       def user_params
