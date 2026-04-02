@@ -32,7 +32,7 @@ export const usersApi = {
 		return httpClient.get<PaginatedResponse<User>>(`/users?${params}`);
 	},
 
-	get: (id: number) => httpClient.get<UserProfile>(`/users/${id}`),
+	get: (slug: string) => httpClient.get<UserProfile>(`/users/${slug}`),
 
 	getCurrent: () => httpClient.get<UserProfile>('/users/current'),
 

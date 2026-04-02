@@ -18,7 +18,7 @@
 	let { users, sortState, onSort, loading, fetching, error }: UserTableProps = $props();
 
 	const columns: ColumnDef<User>[] = [
-		{ key: 'profile', header: '', cell: profileCell, href: (user) => '/users/' + user.id },
+		{ key: 'profile', header: '', cell: profileCell, href: (user) => '/users/' + user.slug },
 		{ key: 'firstName', header: 'First Name', cell: firstNameCell, sortable: true },
 		{ key: 'lastName', header: 'Last Name', cell: lastNameCell, sortable: true },
 		{ key: 'email', header: 'Email', cell: emailCell, sortable: true },

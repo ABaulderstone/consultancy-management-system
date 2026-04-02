@@ -14,6 +14,7 @@ export interface User {
 	role: Role;
 	employmentStatus: EmploymentStatus;
 	assignmentStatus: AssignmentStatus;
+	slug: string;
 }
 
 export interface ContractSummary {

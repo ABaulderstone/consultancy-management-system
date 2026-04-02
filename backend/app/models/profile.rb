@@ -4,7 +4,11 @@ class Profile < ApplicationRecord
     user_id = where(slug: slug).pick(:user_id)
     return user_id if user_id
 
-    SlugHistory.active.where(slug: slug).pick(:user_id)
+    user_id = SlugHistory.active.where(slug: slug).pick(:user_id)
+    return user_id if user_id
+
+    return User.find(slug).id
+
   end
   
   belongs_to :user

@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { toast } from 'svelte-sonner';
-	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faUser } from '@fortawesome/free-solid-svg-icons';
 	import Card from '$lib/components/ui/Card/Card.svelte';
 	import { usersApi } from '../../../lib/api/user';
 	import UserForm from '../../../lib/components/user/UserForm/UserForm.svelte';
@@ -13,12 +11,12 @@
 	import type { BadgeVariant } from '../../../lib/types/badge';
 	import DetailRow from '../../../lib/components/ui/DetailRow';
 
-	const userId = $derived(Number($page.params.id));
+	const userSlug = $derived(page.params.slug ?? 'unknown');
 	const queryClient = useQueryClient();
 
 	const userQuery = createQuery(() => ({
-		queryKey: ['users', userId],
-		queryFn: () => usersApi.get(userId)
+		queryKey: ['users', userSlug],
+		queryFn: () => usersApi.get(userSlug)
 	}));
 
 	const employmentStatusVariant: Record<string, BadgeVariant> = {
@@ -32,9 +30,9 @@
 		bench: 'warning'
 	};
 
-	async function handleUpdate(data: UserFormData) {
+	async function handleUpdate(userId: number, data: UserFormData) {
 		await usersApi.update(userId, data);
-		queryClient.invalidateQueries({ queryKey: ['users', userId] });
+		queryClient.invalidateQueries({ queryKey: ['users', userSlug] });
 		toast.success('User updated');
 	}
 </script>
@@ -81,7 +79,7 @@
 
 					<hr />
 
-					<UserForm mode="edit" {user} onSubmit={handleUpdate} />
+					<UserForm mode="edit" {user} onSubmit={(data) => handleUpdate(user.id, data)} />
 				</Card>
 			</div>
 
