@@ -49,6 +49,21 @@ RSpec.configure do |config|
               }
             }
           },
+          profit_summary: {
+            type: :array, 
+            items: {
+              type: :object,
+              required: [ 'date', 'revenue', 'cost', 'profit', 'projected' ],
+              properties: {
+                date:      { type: :string, format: :date },
+                revenue:   { type: :number },
+                cost:      { type: :number },
+                profit:    { type: :number },
+                projected: { type: :boolean }
+              },
+              additionalProperties: false
+            }
+          },
           user: {
               type: :object,
               required: [ "id", "email", "role", "employment_status" ],

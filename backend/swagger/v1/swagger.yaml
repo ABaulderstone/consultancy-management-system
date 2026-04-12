@@ -5,6 +5,53 @@ info:
   version: v1
   description: HR Management API
 paths:
+  "/analytics/profit_summary":
+    get:
+      summary: Profit summary
+      tags:
+      - Analytics
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      parameters:
+      - name: month
+        in: query
+        required: false
+        description: Month to summarise in YYYY-MM format. Returns one entry per working
+          day.
+        schema:
+          type: string
+      - name: year
+        in: query
+        required: false
+        description: Year to summarise in YYYY format. Returns one entry per month.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: defaults to current month when no params given
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/profit_summary"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '422':
+          description: invalid year format
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
   "/session":
     get:
       summary: Get current session
@@ -199,13 +246,13 @@ paths:
                   type: string
                 gender:
                   type: string
-  "/users/{id}":
+  "/users/{slug}":
     parameters:
-    - name: id
+    - name: slug
       in: path
       required: true
       schema:
-        type: integer
+        type: string
     get:
       summary: Get a user
       tags:
@@ -354,6 +401,29 @@ components:
             type: array
             items:
               type: string
+    profit_summary:
+      type: array
+      items:
+        type: object
+        required:
+        - date
+        - revenue
+        - cost
+        - profit
+        - projected
+        properties:
+          date:
+            type: string
+            format: date
+          revenue:
+            type: number
+          cost:
+            type: number
+          profit:
+            type: number
+          projected:
+            type: boolean
+        additionalProperties: false
     user:
       type: object
       required:
