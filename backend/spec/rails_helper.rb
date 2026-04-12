@@ -98,5 +98,7 @@ RSpec.configure do |config|
 
 
   config.include FactoryBot::Syntax::Methods
+  config.include ActiveSupport::Testing::TimeHelpers
+
   JsonMatchers.schema_root = "spec/support/api/schemas"
 end
