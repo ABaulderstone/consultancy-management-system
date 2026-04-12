@@ -3,8 +3,10 @@ module ErrorHandling
 
   included do
     ERROR_STATUS_MAP = {
+      ActiveRecord::RecordNotFound => :not_found,
       ActiveRecord::RecordNotUnique => :conflict,
       ForbiddenError => :forbidden,
+      InvalidParamsError => :unprocessable_entity,
       UnauthorizedError => :unauthorized
     }.freeze
 
@@ -34,8 +36,7 @@ module ErrorHandling
         message: message,
         path: request.path
       }
-      payload[:details] = errors  if errors.present?
-      render  json: payload, status: status
+      payload[:details] = errors if errors.present?
+      render json: payload, status: status
     end
-
 end
