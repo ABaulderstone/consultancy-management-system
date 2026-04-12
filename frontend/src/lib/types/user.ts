@@ -1,3 +1,5 @@
+import type { ApiRequestBody } from './api';
+
 export type Role = 'employee' | 'admin';
 export type Gender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
 export type EmploymentStatus = 'active' | 'departed' | 'uncontracted';
@@ -42,4 +44,19 @@ export interface UserProfile extends User {
 	currentContract: ContractSummary | null;
 	currentJob: JobSummary | null;
 	lifetimeUtilisation: number;
+}
+
+export interface CreateUserParams extends ApiRequestBody {
+	firstName: string;
+	lastName: string;
+	dateOfBirth?: string;
+	gender?: string;
+}
+
+export interface UpdateUserParams extends ApiRequestBody {
+	firstName?: string;
+	lastName?: string;
+	dateOfBirth?: string;
+	gender?: string;
+	title?: string;
 }

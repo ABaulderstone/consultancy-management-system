@@ -10,6 +10,10 @@
 	import Badge from '../../../lib/components/ui/Badge';
 	import type { BadgeVariant } from '../../../lib/types/badge';
 	import DetailRow from '../../../lib/components/ui/DetailRow';
+	import { employeeApi } from '../../../lib/api/employee';
+	import Accordion from '../../../lib/components/ui/Accordion/Accordion.svelte';
+	import { ContractHistoryList } from '../../../lib/components/user/ContractHistoryList';
+	import { AssignmentHistoryList } from '../../../lib/components/user/AssignmentHistoryList';
 
 	const userSlug = $derived(page.params.slug ?? 'unknown');
 	const queryClient = useQueryClient();
@@ -17,6 +21,18 @@
 	const userQuery = createQuery(() => ({
 		queryKey: ['users', userSlug],
 		queryFn: () => usersApi.get(userSlug)
+	}));
+
+	const contractsQuery = createQuery(() => ({
+		queryKey: ['users', userSlug, 'contracts'],
+		queryFn: () => employeeApi.getContractHistory(userSlug),
+		enabled: false
+	}));
+
+	const assignmentsQuery = createQuery(() => ({
+		queryKey: ['users', userSlug, 'assignments'],
+		queryFn: () => employeeApi.getAssignmentHistory(userSlug),
+		enabled: false
 	}));
 
 	const employmentStatusVariant: Record<string, BadgeVariant> = {
@@ -140,6 +156,22 @@
 					</Card>
 				</div>
 			</div>
+							<Accordion
+					title="Contract History"
+					loading={contractsQuery.isLoading}
+					error={contractsQuery.isError}
+					onOpen={() => contractsQuery.refetch()}
+				>
+					<ContractHistoryList contracts={contractsQuery.data ?? []} />
+				</Accordion>
+
+				<Accordion
+					title="Assignment History"
+					loading={assignmentsQuery.isLoading}
+					error={assignmentsQuery.isError}
+					onOpen={() => assignmentsQuery.refetch()}>
+					<AssignmentHistoryList assignments={assignmentsQuery.data ?? []} />
+				</Accordion>
 		</div>
 	</div>
 {/if}
