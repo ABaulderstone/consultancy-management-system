@@ -1,28 +1,98 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
+	import Widget from '$lib/components/ui/Widget/Widget.svelte';
+	import type { PeriodView } from '../../../lib/types/dashboard';
+	import PeriodControls from '../../../lib/components/ui/PeriodControls/PeriodControls.svelte';
 	import { ProfitSummaryChart } from '../../../lib/components/analytics/ProfitSumaryChart';
-	import { Widget } from '../../../lib/components/ui/Widget';
-	import { mockYearlyData } from '../../../lib/mocks/profit-summary';
+	import { analyticsApi } from '../../../lib/api/analytics';
+
+	const view = $derived((page.url.searchParams.get('view') ?? 'month') as PeriodView);
+
+	const monthParam = $derived(
+		page.url.searchParams.get('month') ??
+			new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit' })
+	);
+
+	const yearParam = $derived(page.url.searchParams.get('year') ?? String(new Date().getFullYear()));
+
+	const label = $derived(
+		view === 'month'
+			? new Date(monthParam + '-02').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+			: yearParam
+	);
+
+	function updateParams(updates: Record<string, string>) {
+		const params = new SvelteURLSearchParams(page.url.searchParams);
+		Object.entries(updates).forEach(([key, value]) => params.set(key, value));
+		goto(`?${params}`, { replaceState: false, keepFocus: true, noScroll: true });
+	}
+
+	function handleViewChange(v: PeriodView) {
+		updateParams({ view: v });
+	}
+
+	function handlePrevious() {
+		if (view === 'month') {
+			const d = new Date(monthParam + '-02');
+			d.setMonth(d.getMonth() - 1);
+			updateParams({
+				view,
+				month: d.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit' })
+			});
+		} else {
+			updateParams({ view, year: String(Number(yearParam) - 1) });
+		}
+	}
+
+	function handleNext() {
+		if (view === 'month') {
+			const d = new Date(monthParam + '-02');
+			d.setMonth(d.getMonth() + 1);
+			updateParams({
+				view,
+				month: d.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit' })
+			});
+		} else {
+			updateParams({ view, year: String(Number(yearParam) + 1) });
+		}
+	}
+
+	const profitQuery = createQuery(() => ({
+		queryKey: ['analytics', 'profitSummary', view, view === 'month' ? monthParam : yearParam],
+		queryFn: () =>
+			view === 'month'
+				? analyticsApi.profitSummary({ month: monthParam })
+				: analyticsApi.profitSummary({ year: yearParam })
+	}));
 </script>
 
-<main>
-	<div class="container py-4">
-		<!-- <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container py-4">
+	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Dashboard</h1>
 		<PeriodControls
-			view={dashboardStore.view}
-			label={dashboardStore.label}
-			onPrevious={dashboardStore.previous}
-			onNext={dashboardStore.next}
-			onViewChange={dashboardStore.setView}
+			{view}
+			{label}
+			onPrevious={handlePrevious}
+			onNext={handleNext}
+			onViewChange={handleViewChange}
 		/>
-	</div> -->
+	</div>
 
-		<div class="row g-4">
-			<div class="col-lg-6">
-				<Widget title="Profit Summary">
-					<ProfitSummaryChart data={mockYearlyData()} view={'year'} />
-				</Widget>
-			</div>
+	<div class="row g-4">
+		<div class="col-lg-6">
+			<Widget
+				title="Profit Summary"
+				isLoading={profitQuery.isLoading}
+				isFetching={profitQuery.isFetching}
+				isError={profitQuery.isError}
+			>
+				{#if profitQuery.data}
+					<ProfitSummaryChart data={profitQuery.data} {view} />
+				{/if}
+			</Widget>
 		</div>
 	</div>
-</main>
+</div>

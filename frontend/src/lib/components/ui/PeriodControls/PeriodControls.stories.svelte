@@ -1,19 +1,14 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import PeriodControls from './PeriodControls.svelte';
-
-	type View = 'month' | 'year';
+	import type { PeriodView } from '../../../types/dashboard';
 
 	const { Story } = defineMeta({
 		title: 'UI/PeriodControls',
 		tags: ['autodocs']
 	});
-</script>
 
-<script lang="ts">
-	type View = 'month' | 'year';
-
-	let view = $state<View>('month');
+	let view = $state<PeriodView>('month');
 	let date = $state(new Date());
 
 	const label = $derived(
@@ -34,7 +29,6 @@
 		date = d;
 	}
 </script>
-
 
 <Story name="Month View - Static March 2024">
 	{#snippet children()}

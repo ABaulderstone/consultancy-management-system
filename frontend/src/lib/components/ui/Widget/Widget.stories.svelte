@@ -12,8 +12,6 @@
 			isError: { control: 'boolean' }
 		}
 	});
-
-	// ✅ Define snippets here
 </script>
 
 <!-- Header actions -->
