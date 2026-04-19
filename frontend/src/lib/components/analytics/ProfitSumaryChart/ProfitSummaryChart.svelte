@@ -91,7 +91,7 @@
 			legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } },
 			tooltip: {
 				callbacks: {
-					label: (ctx: any) => ` ${ctx.dataset.label}: $${ctx.parsed.y?.toLocaleString() ?? 0}`
+					label: (ctx) => ` ${ctx.dataset.label}: $${ctx.parsed.y?.toLocaleString() ?? 0}`
 				}
 			}
 		},

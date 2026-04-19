@@ -5,3 +5,8 @@ export interface ProfitSummaryReport {
 	profit: number;
 	projected: boolean;
 }
+
+export interface RevenueShare {
+	clientName: string;
+	share: number;
+}

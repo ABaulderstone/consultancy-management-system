@@ -5,6 +5,10 @@ class AnalyticsController < ApplicationController
     render json: Analytics::ProfitSummary.call(period: parse_period)
   end
 
+  def revenue_share
+    render json: Analytics::RevenueShare.call(period: parse_period)
+  end
+
   private
 
   def parse_period

@@ -8,6 +8,7 @@
 	import PeriodControls from '../../../lib/components/ui/PeriodControls/PeriodControls.svelte';
 	import { ProfitSummaryChart } from '../../../lib/components/analytics/ProfitSumaryChart';
 	import { analyticsApi } from '../../../lib/api/analytics';
+	import RevenueShareChart from '../../../lib/components/analytics/RevenueShareChart/RevenueShareChart.svelte';
 
 	const view = $derived((page.url.searchParams.get('view') ?? 'month') as PeriodView);
 
@@ -67,6 +68,14 @@
 				? analyticsApi.profitSummary({ month: monthParam })
 				: analyticsApi.profitSummary({ year: yearParam })
 	}));
+
+	const revenueShareQuery = createQuery(() => ({
+		queryKey: ['analytics', 'revenueShare', view, view === 'month' ? monthParam : yearParam],
+		queryFn: () =>
+			view === 'month'
+				? analyticsApi.revenueShare({ month: monthParam })
+				: analyticsApi.revenueShare({ year: yearParam })
+	}));
 </script>
 
 <div class="container py-4">
@@ -91,6 +100,18 @@
 			>
 				{#if profitQuery.data}
 					<ProfitSummaryChart data={profitQuery.data} {view} />
+				{/if}
+			</Widget>
+		</div>
+		<div class="col-lg-6">
+			<Widget
+				title="Revenue Share"
+				isLoading={revenueShareQuery.isLoading}
+				isFetching={revenueShareQuery.isFetching}
+				isError={revenueShareQuery.isError}
+			>
+				{#if revenueShareQuery.data}
+					<RevenueShareChart data={revenueShareQuery.data} />
 				{/if}
 			</Widget>
 		</div>
