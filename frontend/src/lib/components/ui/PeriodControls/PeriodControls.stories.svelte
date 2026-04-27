@@ -18,50 +18,50 @@
 	);
 
 	function previous() {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const d = new Date(date);
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		view === 'month' ? d.setMonth(d.getMonth() - 1) : d.setFullYear(d.getFullYear() - 1);
 		date = d;
 	}
 
 	function next() {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const d = new Date(date);
+
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		view === 'month' ? d.setMonth(d.getMonth() + 1) : d.setFullYear(d.getFullYear() + 1);
 		date = d;
 	}
 </script>
 
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 <Story name="Month View - Static March 2024">
-	{#snippet children()}
-		<PeriodControls
-			view="month"
-			label="March 2024"
-			onPrevious={() => {}}
-			onNext={() => {}}
-			onViewChange={() => {}}
-		/>
-	{/snippet}
+	<PeriodControls
+		view="month"
+		label="March 2024"
+		onPrevious={() => {}}
+		onNext={() => {}}
+		onViewChange={() => {}}
+	/>
 </Story>
 
 <Story name="Year View - Static 2024">
-	{#snippet children()}
-		<PeriodControls
-			view="year"
-			label="2024"
-			onPrevious={() => {}}
-			onNext={() => {}}
-			onViewChange={() => {}}
-		/>
-	{/snippet}
+	<PeriodControls
+		view="year"
+		label="2024"
+		onPrevious={() => {}}
+		onNext={() => {}}
+		onViewChange={() => {}}
+	/>
 </Story>
 
 <Story name="Interactive">
-	{#snippet children()}
-		<PeriodControls
-			{view}
-			{label}
-			onPrevious={previous}
-			onNext={next}
-			onViewChange={(v) => (view = v)}
-		/>
-	{/snippet}
+	<PeriodControls
+		{view}
+		{label}
+		onPrevious={previous}
+		onNext={next}
+		onViewChange={(v) => (view = v)}
+	/>
 </Story>

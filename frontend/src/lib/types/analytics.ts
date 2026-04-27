@@ -10,3 +10,11 @@ export interface RevenueShare {
 	clientName: string;
 	share: number;
 }
+
+export interface UtilizationReport {
+	date: string;
+	assigned: number;
+	available: number;
+	utilization: number;
+	projected: boolean;
+}

@@ -14,22 +14,16 @@
 {/snippet}
 
 <Story name="Default" args={{ title: 'Card Title' }}>
-	{#snippet children()}
-		<p>This is a simple card body.</p>
-	{/snippet}
+	<p>This is a simple card body.</p>
 </Story>
 
 <Story name="With Header Action" args={{ title: 'Card Title', header: header }}>
-	{#snippet children()}
-		<p>Card with header action.</p>
-	{/snippet}
+	<p>Card with header action.</p>
 </Story>
 
 <Story name="Custom Content (No Title)">
-	{#snippet children()}
-		<div class="d-flex justify-content-between">
-			<span>Left</span>
-			<span>Right</span>
-		</div>
-	{/snippet}
+	<div class="d-flex justify-content-between">
+		<span>Left</span>
+		<span>Right</span>
+	</div>
 </Story>

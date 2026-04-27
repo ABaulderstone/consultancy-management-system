@@ -1,4 +1,8 @@
-import type { ProfitSummaryReport, RevenueShare } from '../types/analytics';
+import {
+	type UtilizationReport,
+	type ProfitSummaryReport,
+	type RevenueShare
+} from '../types/analytics';
 
 import { httpClient } from './client';
 interface ReportQueryParams {
@@ -28,5 +32,9 @@ export const analyticsApi = {
 	revenueShare: (queryParams: ReportQueryParams) => {
 		const params = convertParams(queryParams);
 		return httpClient.get<RevenueShare[]>(`/analytics/revenue_share?${params}`);
+	},
+	utilizationSummary: (queryParams: ReportQueryParams) => {
+		const params = convertParams(queryParams);
+		return httpClient.get<UtilizationReport[]>(`/analytics/utilization_summary?${params}`);
 	}
 };

@@ -9,6 +9,10 @@ class AnalyticsController < ApplicationController
     render json: Analytics::RevenueShare.call(period: parse_period)
   end
 
+  def utilization_summary 
+    render json: Analytics::UtilizationSummary.call(period: parse_period)
+  end
+
   private
 
   def parse_period
