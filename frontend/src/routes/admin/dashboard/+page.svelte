@@ -1,4 +1,5 @@
 <script lang="ts">
+	/* eslint-disable svelte/prefer-svelte-reactivity */
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { createQuery } from '@tanstack/svelte-query';
@@ -6,9 +7,10 @@
 	import Widget from '$lib/components/ui/Widget/Widget.svelte';
 	import type { PeriodView } from '../../../lib/types/dashboard';
 	import PeriodControls from '../../../lib/components/ui/PeriodControls/PeriodControls.svelte';
-	import { ProfitSummaryChart } from '../../../lib/components/analytics/ProfitSumaryChart';
+	import { ProfitSummaryChart } from '../../../lib/components/analytics/ProfitSummaryChart';
 	import { analyticsApi } from '../../../lib/api/analytics';
 	import RevenueShareChart from '../../../lib/components/analytics/RevenueShareChart/RevenueShareChart.svelte';
+	import { UtilizationChart } from '../../../lib/components/analytics/UtilizationChart';
 
 	const view = $derived((page.url.searchParams.get('view') ?? 'month') as PeriodView);
 
@@ -76,6 +78,14 @@
 				? analyticsApi.revenueShare({ month: monthParam })
 				: analyticsApi.revenueShare({ year: yearParam })
 	}));
+
+	const utilizationQuery = createQuery(() => ({
+		queryKey: ['analytics', 'utilization', view, view === 'month' ? monthParam : yearParam],
+		queryFn: () =>
+			view === 'month'
+				? analyticsApi.utilizationSummary({ month: monthParam })
+				: analyticsApi.utilizationSummary({ year: yearParam })
+	}));
 </script>
 
 <div class="container py-4">
@@ -103,6 +113,20 @@
 				{/if}
 			</Widget>
 		</div>
+
+		<div class="col-lg-6">
+			<Widget
+				title="Utilization"
+				isLoading={utilizationQuery.isLoading}
+				isFetching={utilizationQuery.isFetching}
+				isError={utilizationQuery.isError}
+			>
+				{#if utilizationQuery.data}
+					<UtilizationChart data={utilizationQuery.data} {view} />
+				{/if}
+			</Widget>
+		</div>
+
 		<div class="col-lg-6">
 			<Widget
 				title="Revenue Share"
