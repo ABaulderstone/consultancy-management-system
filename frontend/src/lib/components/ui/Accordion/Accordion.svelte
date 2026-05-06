@@ -6,6 +6,7 @@
 		faChevronUp,
 		faCircleExclamation
 	} from '@fortawesome/free-solid-svg-icons';
+	import Button from '../Button';
 
 	interface AccordionProps {
 		title: string;
@@ -15,6 +16,11 @@
 		error?: boolean;
 		errorMessage?: string;
 		defaultOpen?: boolean;
+		action?: {
+			label: string;
+			loading?: boolean;
+			onClick: () => void;
+		};
 		children: Snippet;
 	}
 
@@ -26,6 +32,7 @@
 		error = false,
 		errorMessage = 'Failed to load data',
 		defaultOpen = false,
+		action,
 		children
 	}: AccordionProps = $props();
 
@@ -45,9 +52,13 @@
 
 <div class="accordion">
 	<div class="accordion-item">
-		<h2 class="accordion-header">
+		<div
+			class="d-flex align-items-center px-3 py-2 accordion-header {open
+				? 'accordion-header--open'
+				: ''}"
+		>
 			<button
-				class="accordion-button {open ? '' : 'collapsed'}"
+				class="btn btn-link text-start text-decoration-none p-0 flex-grow-1 fw-medium"
 				type="button"
 				onclick={toggle}
 				aria-expanded={open}
@@ -56,40 +67,61 @@
 				{#if subtitle}
 					<span class="text-muted fw-normal small">{subtitle}</span>
 				{/if}
-				{#key open}
-					<FontAwesomeIcon
-						icon={open ? faChevronUp : faChevronDown}
-						class="ms-auto me-2 text-secondary"
-					/>
-				{/key}
 			</button>
-		</h2>
+
+			<div class="d-flex align-items-center gap-2">
+				{#if action}
+					<Button
+						variant="outline-primary"
+						size="sm"
+						loading={action.loading}
+						onclick={action.onClick}
+					>
+						{action.label}
+					</Button>
+				{/if}
+				<button
+					type="button"
+					class="btn btn-link p-0 text-secondary"
+					onclick={toggle}
+					tabindex="-1"
+					aria-hidden="true"
+				>
+					<FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
+				</button>
+			</div>
+		</div>
 
 		{#if open}
-			<div class="accordion-collapse">
-				<div class="accordion-body">
-					{#if loading}
-						<div class="d-flex align-items-center gap-2 text-muted">
-							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-							></span>
-							<span class="small">Loading…</span>
-						</div>
-					{:else if error}
-						<div class="d-flex align-items-center gap-2 text-danger small">
-							<FontAwesomeIcon icon={faCircleExclamation} />
-							{errorMessage}
-						</div>
-					{:else}
-						{@render children()}
-					{/if}
-				</div>
+			<div class="accordion-body">
+				{#if loading}
+					<div class="d-flex align-items-center gap-2 text-muted">
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+						<span class="small">Loading…</span>
+					</div>
+				{:else if error}
+					<div class="d-flex align-items-center gap-2 text-danger small">
+						<FontAwesomeIcon icon={faCircleExclamation} />
+						{errorMessage}
+					</div>
+				{:else}
+					{@render children()}
+				{/if}
 			</div>
 		{/if}
 	</div>
 </div>
 
 <style>
-	/* suppress Bootstrap's built-in chevron — we're using FontAwesome instead */
+	.accordion-header {
+		background-color: #dce8f8;
+		border-radius: 4px;
+		background-color: transparent;
+	}
+	.accordion-header--open {
+		background-color: #dce8f8;
+	}
+
 	.accordion-button::after {
 		display: none;
 	}

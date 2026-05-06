@@ -13,7 +13,8 @@
 			loading: { control: 'boolean' },
 			error: { control: 'boolean' },
 			errorMessage: { control: 'text' },
-			defaultOpen: { control: 'boolean' }
+			defaultOpen: { control: 'boolean' },
+			action: { control: 'object' }
 		},
 		args: {
 			onOpen: fn()
@@ -73,6 +74,36 @@
 		const canvas = within(canvasElement);
 		await expect(canvas.getByText('Could not load data')).toBeInTheDocument();
 		await expect(canvas.queryByText('Should be hidden')).not.toBeInTheDocument();
+	}
+
+	async function playActionButtonVisible({ canvasElement }: any) {
+		const canvas = within(canvasElement);
+		const action = canvas.getByRole('button', { name: /new contract/i });
+		await expect(action).toBeInTheDocument();
+	}
+
+	async function playActionDoesNotToggle({ canvasElement }: any) {
+		const canvas = within(canvasElement);
+		const button = canvas.getByRole('button', { name: /contract history/i });
+		const action = canvas.getByRole('button', { name: /new contract/i });
+
+		await expect(button).toHaveAttribute('aria-expanded', 'true');
+		await userEvent.click(action);
+		await expect(button).toHaveAttribute('aria-expanded', 'true'); // still open
+	}
+
+	async function playActionCallbackFires({ canvasElement, args }: any) {
+		const canvas = within(canvasElement);
+		const action = canvas.getByRole('button', { name: /new contract/i });
+
+		await userEvent.click(action);
+		await expect(args.action.onclick).toHaveBeenCalledTimes(1);
+	}
+
+	async function playActionLoadingState({ canvasElement }: any) {
+		const canvas = within(canvasElement);
+		const action = canvas.getByRole('button', { name: /new contract/i });
+		await expect(action).toBeDisabled();
 	}
 </script>
 
@@ -182,5 +213,64 @@
 >
 	{#snippet children()}
 		Should be hidden
+	{/snippet}
+</Story>
+<!-- Action button is visible in the header -->
+<Story
+	name="With Action"
+	args={{
+		title: 'Contract History',
+		defaultOpen: true,
+		action: { label: '+ New contract', onclick: fn() }
+	}}
+	play={playActionButtonVisible}
+>
+	{#snippet children()}
+		Some content inside the accordion.
+	{/snippet}
+</Story>
+
+<!-- Clicking the action button does not collapse the accordion -->
+<Story
+	name="Action Does Not Toggle"
+	args={{
+		title: 'Contract History',
+		defaultOpen: true,
+		action: { label: '+ New contract', onclick: fn() }
+	}}
+	play={playActionDoesNotToggle}
+>
+	{#snippet children()}
+		Some content inside the accordion.
+	{/snippet}
+</Story>
+
+<!-- Action onclick callback is called when clicked -->
+<Story
+	name="Action Fires Callback"
+	args={{
+		title: 'Contract History',
+		defaultOpen: true,
+		action: { label: '+ New contract', onclick: fn() }
+	}}
+	play={playActionCallbackFires}
+>
+	{#snippet children()}
+		Some content inside the accordion.
+	{/snippet}
+</Story>
+
+<!-- Action button shows loading/disabled state -->
+<Story
+	name="Action Loading"
+	args={{
+		title: 'Contract History',
+		defaultOpen: true,
+		action: { label: '+ New contract', onclick: fn(), loading: true }
+	}}
+	play={playActionLoadingState}
+>
+	{#snippet children()}
+		Some content inside the accordion.
 	{/snippet}
 </Story>
