@@ -87,7 +87,9 @@
 					tabindex="-1"
 					aria-hidden="true"
 				>
-					<FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
+					{#key open}
+						<FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
+					{/key}
 				</button>
 			</div>
 		</div>

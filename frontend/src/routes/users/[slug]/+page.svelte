@@ -156,22 +156,24 @@
 					</Card>
 				</div>
 			</div>
-							<Accordion
-					title="Contract History"
-					loading={contractsQuery.isLoading}
-					error={contractsQuery.isError}
-					onOpen={() => contractsQuery.refetch()}
-				>
-					<ContractHistoryList contracts={contractsQuery.data ?? []} />
-				</Accordion>
+			<Accordion
+				title="Contract History"
+				loading={contractsQuery.isLoading}
+				error={contractsQuery.isError}
+				onOpen={() => contractsQuery.refetch()}
+				action={{ label: 'New Contract', onClick: () => console.log('clicked') }}
+			>
+				<ContractHistoryList contracts={contractsQuery.data ?? []} />
+			</Accordion>
 
-				<Accordion
-					title="Assignment History"
-					loading={assignmentsQuery.isLoading}
-					error={assignmentsQuery.isError}
-					onOpen={() => assignmentsQuery.refetch()}>
-					<AssignmentHistoryList assignments={assignmentsQuery.data ?? []} />
-				</Accordion>
+			<Accordion
+				title="Assignment History"
+				loading={assignmentsQuery.isLoading}
+				error={assignmentsQuery.isError}
+				onOpen={() => assignmentsQuery.refetch()}
+			>
+				<AssignmentHistoryList assignments={assignmentsQuery.data ?? []} />
+			</Accordion>
 		</div>
 	</div>
 {/if}

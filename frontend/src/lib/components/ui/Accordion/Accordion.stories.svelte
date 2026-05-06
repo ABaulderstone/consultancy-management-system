@@ -97,7 +97,7 @@
 		const action = canvas.getByRole('button', { name: /new contract/i });
 
 		await userEvent.click(action);
-		await expect(args.action.onclick).toHaveBeenCalledTimes(1);
+		await expect(args.action.onClick).toHaveBeenCalledTimes(1);
 	}
 
 	async function playActionLoadingState({ canvasElement }: any) {
@@ -221,7 +221,7 @@
 	args={{
 		title: 'Contract History',
 		defaultOpen: true,
-		action: { label: '+ New contract', onclick: fn() }
+		action: { label: '+ New contract', onClick: fn() }
 	}}
 	play={playActionButtonVisible}
 >
@@ -236,7 +236,7 @@
 	args={{
 		title: 'Contract History',
 		defaultOpen: true,
-		action: { label: '+ New contract', onclick: fn() }
+		action: { label: '+ New contract', onClick: fn() }
 	}}
 	play={playActionDoesNotToggle}
 >
@@ -251,7 +251,7 @@
 	args={{
 		title: 'Contract History',
 		defaultOpen: true,
-		action: { label: '+ New contract', onclick: fn() }
+		action: { label: '+ New contract', onClick: fn() }
 	}}
 	play={playActionCallbackFires}
 >
@@ -266,7 +266,7 @@
 	args={{
 		title: 'Contract History',
 		defaultOpen: true,
-		action: { label: '+ New contract', onclick: fn(), loading: true }
+		action: { label: '+ New contract', onClick: fn(), loading: true }
 	}}
 	play={playActionLoadingState}
 >
