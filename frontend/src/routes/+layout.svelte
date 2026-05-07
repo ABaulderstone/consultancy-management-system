@@ -15,6 +15,8 @@
 	import { toast, Toaster } from 'svelte-sonner';
 	import Navbar from '../lib/components/layout/Navbar';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { departmentApi } from '../lib/api/department';
+	import { positionsApi } from '../lib/api/position';
 
 	const queryClient = new QueryClient();
 
@@ -29,6 +31,16 @@
 	onMount(async () => {
 		try {
 			authStore.user = await sessionApi.get();
+			queryClient.prefetchQuery({
+				queryKey: ['departments'],
+				queryFn: departmentApi.list,
+				staleTime: Infinity
+			});
+			queryClient.prefetchQuery({
+				queryKey: ['positions'],
+				queryFn: positionsApi.list,
+				staleTime: Infinity
+			});
 		} catch {
 			authStore.user = null;
 		} finally {

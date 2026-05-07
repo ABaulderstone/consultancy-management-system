@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { superForm, defaults, type ValidationErrors } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
-	import { z } from 'zod';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faPen, faXmark, faCheck } from '@fortawesome/free-solid-svg-icons';
 	import { handleFormSubmit } from '$lib/utils/form';
@@ -13,7 +12,7 @@
 	import FormRow from '$lib/components/ui/Form/FormRow.svelte';
 	import Button from '$lib/components/ui/Button/Button.svelte';
 	import FormRadio from '../../ui/Form/FormRadio.svelte';
-	import type { UpdateUserParams } from '../../../api/user';
+
 	import { schema, type UserFormData, GENDER_OPTIONS } from './schema';
 
 	interface UserFormProps {
@@ -25,8 +24,6 @@
 	let { mode, user, onSubmit }: UserFormProps = $props();
 
 	let editing = $state(mode === 'create');
-
-	export type { UserFormData };
 
 	const defaultValues: UserFormData = {
 		firstName: user?.firstName ?? '',
