@@ -9,7 +9,7 @@ function normalizePosition(position: PositionResponse): NormalizedPositionRespon
 	};
 }
 
-export const positionsApi = {
+export const positionApi = {
 	list: async () => {
 		const positions = await httpClient.get<PositionResponse[]>('/positions');
 		return positions.map(normalizePosition);

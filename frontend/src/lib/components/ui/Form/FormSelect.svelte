@@ -1,34 +1,35 @@
 <script lang="ts">
 	import type { HTMLSelectAttributes } from 'svelte/elements';
 
-	export interface Option {
+	type Option = {
 		label: string;
-		value: string | number;
-	}
+		value: number | string;
+	};
 
-	interface FormSelectProps extends HTMLSelectAttributes {
-		error?: boolean;
-		value?: string | number;
+	interface Props extends HTMLSelectAttributes {
 		options: Option[];
-		placeholder?: string;
+		value?: number;
 	}
 
-	let {
-		error = false,
-		value = $bindable(''),
-		options = [],
-		placeholder,
-		class: className,
-		...rest
-	}: FormSelectProps = $props();
+	let { options, value = $bindable(), ...rest }: Props = $props();
+
+	let safeValue = $derived(value ?? '');
+
+	function handleChange(e: Event) {
+		const v = (e.target as HTMLSelectElement).value;
+
+		if (v === '') {
+			value = undefined;
+			return;
+		}
+
+		const num = Number(v);
+		value = Number.isNaN(num) ? undefined : num;
+	}
 </script>
 
-<select class="form-select {error ? 'is-invalid' : ''} {className ?? ''}" bind:value {...rest}>
-	{#if placeholder}
-		<option value="" disabled selected={value === ''}>
-			{placeholder}
-		</option>
-	{/if}
+<select {...rest} bind:value={safeValue} on:change={handleChange}>
+	<option value="">Select...</option>
 
 	{#each options as option (option.value)}
 		<option value={option.value}>

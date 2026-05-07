@@ -16,7 +16,7 @@
 	import Navbar from '../lib/components/layout/Navbar';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import { departmentApi } from '../lib/api/department';
-	import { positionsApi } from '../lib/api/position';
+	import { positionApi } from '../lib/api/position';
 
 	const queryClient = new QueryClient();
 
@@ -38,7 +38,7 @@
 			});
 			queryClient.prefetchQuery({
 				queryKey: ['positions'],
-				queryFn: positionsApi.list,
+				queryFn: positionApi.list,
 				staleTime: Infinity
 			});
 		} catch {

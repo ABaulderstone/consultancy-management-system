@@ -15,6 +15,7 @@
 	import { ContractHistoryList } from '../../../lib/components/user/ContractHistoryList';
 	import { AssignmentHistoryList } from '../../../lib/components/user/AssignmentHistoryList';
 	import Modal from '../../../lib/components/ui/Modal';
+	import UserContractForm from '../../../lib/components/user/UserContractForm/UserContractForm.svelte';
 
 	const userSlug = $derived(page.params.slug ?? 'unknown');
 	const queryClient = useQueryClient();
@@ -181,12 +182,8 @@
 		</div>
 	</div>
 
-	<Modal
-		title="Create New Contract"
-		open={contractModalOpen}
-		onClose={() => (contractModalOpen = false)}
-	>
-		<h2>Contract modal</h2>
+	<Modal title="New Contract" open={contractModalOpen} onClose={() => (contractModalOpen = false)}>
+		<UserContractForm userId={user.id} onSubmit={async (data) => console.log(data)} />
 	</Modal>
 	<Modal
 		title="Create New Assignment"
