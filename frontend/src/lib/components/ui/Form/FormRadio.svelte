@@ -30,7 +30,7 @@
 		? 'is-invalid'
 		: ''} {className}"
 >
-	{#each options as option}
+	{#each options as option (option.value)}
 		<div class="form-check">
 			<input
 				class="form-check-input"

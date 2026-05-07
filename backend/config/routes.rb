@@ -11,7 +11,11 @@ Rails.application.routes.draw do
       get :assignments
     end
   end
+
   resource :session, only: [ :show, :create, :destroy ]
+  resources :departments, only: [:index]
+  resources :positions, only: [:index]
+
   
   namespace :analytics do
     get :profit_summary

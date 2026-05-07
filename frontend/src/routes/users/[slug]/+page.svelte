@@ -14,9 +14,12 @@
 	import Accordion from '../../../lib/components/ui/Accordion/Accordion.svelte';
 	import { ContractHistoryList } from '../../../lib/components/user/ContractHistoryList';
 	import { AssignmentHistoryList } from '../../../lib/components/user/AssignmentHistoryList';
+	import Modal from '../../../lib/components/ui/Modal';
 
 	const userSlug = $derived(page.params.slug ?? 'unknown');
 	const queryClient = useQueryClient();
+	let contractModalOpen = $state(false);
+	let assignmentModalOpen = $state(false);
 
 	const userQuery = createQuery(() => ({
 		queryKey: ['users', userSlug],
@@ -161,7 +164,7 @@
 				loading={contractsQuery.isLoading}
 				error={contractsQuery.isError}
 				onOpen={() => contractsQuery.refetch()}
-				action={{ label: 'New Contract', onClick: () => console.log('clicked') }}
+				action={{ label: 'New Contract', onClick: () => (contractModalOpen = true) }}
 			>
 				<ContractHistoryList contracts={contractsQuery.data ?? []} />
 			</Accordion>
@@ -171,9 +174,25 @@
 				loading={assignmentsQuery.isLoading}
 				error={assignmentsQuery.isError}
 				onOpen={() => assignmentsQuery.refetch()}
+				action={{ label: 'New Assignment', onClick: () => (assignmentModalOpen = true) }}
 			>
 				<AssignmentHistoryList assignments={assignmentsQuery.data ?? []} />
 			</Accordion>
 		</div>
 	</div>
+
+	<Modal
+		title="Create New Contract"
+		open={contractModalOpen}
+		onClose={() => (contractModalOpen = false)}
+	>
+		<h2>Contract modal</h2>
+	</Modal>
+	<Modal
+		title="Create New Assignment"
+		open={assignmentModalOpen}
+		onClose={() => (assignmentModalOpen = false)}
+	>
+		<h2>Contract modal</h2>
+	</Modal>
 {/if}
