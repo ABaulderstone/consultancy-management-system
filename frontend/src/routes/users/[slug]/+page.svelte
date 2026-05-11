@@ -16,6 +16,8 @@
 	import { AssignmentHistoryList } from '../../../lib/components/user/AssignmentHistoryList';
 	import Modal from '../../../lib/components/ui/Modal';
 	import UserContractForm from '../../../lib/components/user/UserContractForm/UserContractForm.svelte';
+	import { type UserContractFormData } from '../../../lib/components/user/UserContractForm/schema';
+	import { contractApi } from '../../../lib/api/contract';
 
 	const userSlug = $derived(page.params.slug ?? 'unknown');
 	const queryClient = useQueryClient();
@@ -55,6 +57,14 @@
 		queryClient.invalidateQueries({ queryKey: ['users', userSlug] });
 		toast.success('User updated');
 	}
+
+	async function handleNewContract(data: UserContractFormData) {
+    await contractApi.create(data);
+    await queryClient.invalidateQueries({ queryKey: ['users', userSlug] });
+    await queryClient.invalidateQueries({ queryKey: ['users', userSlug, 'contracts'] });
+    contractModalOpen = false;
+    toast.success('Contract created');
+}
 </script>
 
 {#if userQuery.isLoading}
@@ -183,7 +193,7 @@
 	</div>
 
 	<Modal title="New Contract" open={contractModalOpen} onClose={() => (contractModalOpen = false)}>
-		<UserContractForm userId={user.id} onSubmit={async (data) => console.log(data)} />
+		<UserContractForm userId={user.id} onSubmit={handleNewContract} />
 	</Modal>
 	<Modal
 		title="Create New Assignment"
