@@ -1,56 +1,50 @@
 import { z } from 'zod';
 
 export const CONTRACT_TYPE_OPTIONS = [
-	{ label: 'Full Time', value: 'fullTime' },
-	{ label: 'Part Time', value: 'partTime' }
+	{
+		label: 'Full Time',
+		value: 'fullTime'
+	},
+	{
+		label: 'Part Time',
+		value: 'partTime'
+	}
 ] as const;
-
-const contractTypeEnum = z.enum(['fullTime', 'partTime']);
-
-// reusable helper for form inputs
-const optionalNumber = z.preprocess((val) => {
-	if (val === '' || val === null || val === undefined) return undefined;
-	if (typeof val === 'string' && val.trim() === '') return undefined;
-	return Number(val);
-}, z.number().optional());
 
 export const schema = z
 	.object({
-		userId: z.number(),
-
-		departmentId: z.preprocess(
-			(val) => (val === '' || val === undefined ? undefined : Number(val)),
-			z.number({ error: 'Department is required' })
-		),
-
-		positionId: z.preprocess(
-			(val) => (val === '' || val === undefined ? undefined : Number(val)),
-			z.number({ error: 'Position is required' })
-		),
-
-		contractType: contractTypeEnum,
-
-		hoursPerWeek: optionalNumber,
-
+		userId: z.number().min(1),
+		departmentId: z
+			.number({ error: 'Department must be selected' })
+			.min(1, 'Department must be selected'),
+		positionId: z
+			.number({ error: 'Position must be selected' })
+			.min(1, 'Position must be selected'),
 		fte: z.number(),
 
-		rate: z.preprocess(
-			(val) => (val === '' || val === undefined ? undefined : Number(val)),
-			z.number().positive()
-		),
+		contractType: z.enum(['fullTime', 'partTime']),
 
-		startDate: z.string().min(1),
+		hoursPerWeek: z.number().optional(),
+
+		rate: z.number({ error: 'Rate is required' }).positive('Rate must be greater than 0'),
+
+		startDate: z
+			.string()
+			.min(1, 'Start date is required')
+			.refine((val) => !isNaN(Date.parse(val)), 'Start date is not a valid date'),
+
 		endDate: z.string().optional()
 	})
 	.refine(
 		(data) => {
 			if (!data.endDate) return true;
+			if (isNaN(Date.parse(data.endDate))) return false;
 			return new Date(data.endDate) >= new Date(data.startDate);
 		},
 		{
 			path: ['endDate'],
-			message: 'End date must be after start date'
+			message: 'End date must be on or after start date'
 		}
 	);
 
-export type ContractFormData = z.infer<typeof schema>;
+export type UserContractFormData = z.infer<typeof schema>;

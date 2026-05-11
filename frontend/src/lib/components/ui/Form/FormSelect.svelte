@@ -12,23 +12,9 @@
 	}
 
 	let { options, value = $bindable(), ...rest }: Props = $props();
-
-	let safeValue = $derived(value ?? '');
-
-	function handleChange(e: Event) {
-		const v = (e.target as HTMLSelectElement).value;
-
-		if (v === '') {
-			value = undefined;
-			return;
-		}
-
-		const num = Number(v);
-		value = Number.isNaN(num) ? undefined : num;
-	}
 </script>
 
-<select {...rest} bind:value={safeValue} on:change={handleChange}>
+<select {...rest} bind:value>
 	<option value="">Select...</option>
 
 	{#each options as option (option.value)}

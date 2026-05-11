@@ -3,34 +3,10 @@
 
 	type Props = HTMLInputAttributes & {
 		error?: boolean;
-		value?: string | number | null | undefined;
+		value?: string | number | null;
 	};
 
-	let {
-		error = false,
-		value = $bindable(),
-		type = 'text',
-		class: className,
-		...rest
-	}: Props = $props();
-
-	let safeValue = $derived(value ?? '');
-
-	function handleInput(e: Event) {
-		const el = e.target as HTMLInputElement;
-
-		if (type === 'number') {
-			value = el.value === '' ? undefined : Number(el.value);
-		} else {
-			value = el.value;
-		}
-	}
+	let { error = false, value = $bindable(), class: className, ...rest }: Props = $props();
 </script>
 
-<input
-	{type}
-	class="form-control {error ? 'is-invalid' : ''} {className ?? ''}"
-	value={safeValue}
-	on:input={handleInput}
-	{...rest}
-/>
+<input class="form-control {error ? 'is-invalid' : ''} {className ?? ''}" bind:value {...rest} />
