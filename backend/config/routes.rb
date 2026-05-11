@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   resource :session, only: [ :show, :create, :destroy ]
   resources :departments, only: [:index]
   resources :positions, only: [:index]
+  resources :contracts, only: [:create]
 
   
   namespace :analytics do
