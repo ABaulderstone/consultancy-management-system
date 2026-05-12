@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     get :profit_summary
     get :revenue_share
     get :utilization_summary
+    get :job_flow_summary
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

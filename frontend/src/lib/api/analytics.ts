@@ -1,7 +1,8 @@
 import {
 	type UtilizationReport,
 	type ProfitSummaryReport,
-	type RevenueShare
+	type RevenueShare,
+	type JobsFlowReport
 } from '../types/analytics';
 
 import { httpClient } from './client';
@@ -36,5 +37,9 @@ export const analyticsApi = {
 	utilizationSummary: (queryParams: ReportQueryParams) => {
 		const params = convertParams(queryParams);
 		return httpClient.get<UtilizationReport[]>(`/analytics/utilization_summary?${params}`);
+	},
+	jobFlowSummary: (queryParams: ReportQueryParams) => {
+		const params = convertParams(queryParams);
+		return httpClient.get<JobsFlowReport[]>(`/analytics/job_flow_summary?${params}`);
 	}
 };

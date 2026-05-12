@@ -11,6 +11,7 @@
 	import { analyticsApi } from '../../../lib/api/analytics';
 	import RevenueShareChart from '../../../lib/components/analytics/RevenueShareChart/RevenueShareChart.svelte';
 	import { UtilizationChart } from '../../../lib/components/analytics/UtilizationChart';
+	import JobFlowChart from '../../../lib/components/analytics/JobFlowChart/JobFlowChart.svelte';
 
 	const view = $derived((page.url.searchParams.get('view') ?? 'month') as PeriodView);
 
@@ -86,6 +87,14 @@
 				? analyticsApi.utilizationSummary({ month: monthParam })
 				: analyticsApi.utilizationSummary({ year: yearParam })
 	}));
+
+		const jobFlowQuery = createQuery(() => ({
+		queryKey: ['analytics', 'jobFlow', view, view === 'month' ? monthParam : yearParam],
+		queryFn: () =>
+			view === 'month'
+				? analyticsApi.jobFlowSummary({ month: monthParam })
+				: analyticsApi.jobFlowSummary({ year: yearParam })
+	}));
 </script>
 
 <div class="container py-4">
@@ -100,13 +109,14 @@
 		/>
 	</div>
 
-	<div class="row g-4">
-		<div class="col-lg-6">
+	<div class="row g-4 align-items-stretch">
+		<div class="col-lg-6 d-flex">
 			<Widget
 				title="Profit Summary"
 				isLoading={profitQuery.isLoading}
 				isFetching={profitQuery.isFetching}
 				isError={profitQuery.isError}
+				class="w-100"
 			>
 				{#if profitQuery.data}
 					<ProfitSummaryChart data={profitQuery.data} {view} />
@@ -114,12 +124,13 @@
 			</Widget>
 		</div>
 
-		<div class="col-lg-6">
+		<div class="col-lg-6 d-flex">
 			<Widget
 				title="Utilization"
 				isLoading={utilizationQuery.isLoading}
 				isFetching={utilizationQuery.isFetching}
 				isError={utilizationQuery.isError}
+				class="w-100"
 			>
 				{#if utilizationQuery.data}
 					<UtilizationChart data={utilizationQuery.data} {view} />
@@ -127,15 +138,29 @@
 			</Widget>
 		</div>
 
-		<div class="col-lg-6">
+		<div class="col-lg-6 d-flex">
 			<Widget
 				title="Revenue Share"
 				isLoading={revenueShareQuery.isLoading}
 				isFetching={revenueShareQuery.isFetching}
 				isError={revenueShareQuery.isError}
+				class="w-100"
 			>
 				{#if revenueShareQuery.data}
 					<RevenueShareChart data={revenueShareQuery.data} />
+				{/if}
+			</Widget>
+		</div>
+		<div class="col-lg-6 d-flex">
+			<Widget
+				title="Job Flow"
+				isLoading={jobFlowQuery.isLoading}
+				isFetching={jobFlowQuery.isFetching}
+				isError={jobFlowQuery.isError}
+				class="w-100"
+			>
+				{#if jobFlowQuery.data}
+					<JobFlowChart data={jobFlowQuery.data} {view} />
 				{/if}
 			</Widget>
 		</div>

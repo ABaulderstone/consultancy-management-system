@@ -62,6 +62,7 @@
     await contractApi.create(data);
     await queryClient.invalidateQueries({ queryKey: ['users', userSlug] });
     await queryClient.invalidateQueries({ queryKey: ['users', userSlug, 'contracts'] });
+	await contractsQuery.refetch();
     contractModalOpen = false;
     toast.success('Contract created');
 }

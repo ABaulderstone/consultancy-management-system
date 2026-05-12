@@ -18,3 +18,11 @@ export interface UtilizationReport {
 	utilization: number;
 	projected: boolean;
 }
+
+export interface JobsFlowReport {
+	date: string;
+	started: number;
+	finished: number;
+	active: number;
+	projected: boolean;
+}

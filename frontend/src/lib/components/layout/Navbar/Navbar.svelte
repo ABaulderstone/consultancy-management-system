@@ -21,8 +21,10 @@
 		switch (role) {
 			case 'admin':
 				return [
+					{ label: 'Dashboard', to: '/' },
 					{ label: 'Users', to: '/users' },
-					{ label: 'Dashboard', to: '/' }
+					{ label: 'Clients', to: '/clients' }, 
+					{label: 'Jobs', to: '/jobs'}
 				];
 			case 'employee':
 				return [{ label: 'Dashboard', to: '/' }];

@@ -13,6 +13,10 @@ class AnalyticsController < ApplicationController
     render json: Analytics::UtilizationSummary.call(period: parse_period)
   end
 
+  def job_flow_summary 
+    render json: Analytics::JobsFlowSummary.call(period: parse_period)
+  end
+
   private
 
   def parse_period
