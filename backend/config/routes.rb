@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     member do
       get :contracts
       get :assignments
+      get :available_jobs
     end
   end
 

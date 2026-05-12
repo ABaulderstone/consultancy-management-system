@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: [ :show, :update, :destroy ]
   before_action :only_admin!, only: [ :destroy, :create, :index, :contracts, :assignments ]
   before_action :authorize_admin_or_self!, only: [ :show, :update ]
-  before_action :set_user_id, only: [ :assignments, :contracts ]
+  before_action :set_user_id, only: [ :assignments, :contracts, :available_jobs ]
 
 
 
@@ -43,6 +43,10 @@ class UsersController < ApplicationController
 
   def show
     render json: UserProfileBlueprint.render(@user)
+  end
+
+  def available_jobs
+      render json: Users::FindAvailableJobs.call(@user_id)
   end
 
   def contracts
