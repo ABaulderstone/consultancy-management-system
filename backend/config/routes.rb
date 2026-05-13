@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   resources :departments, only: [:index]
   resources :positions, only: [:index]
   resources :contracts, only: [:create]
+  resources :jobs, only: [:index]
 
   
   namespace :analytics do

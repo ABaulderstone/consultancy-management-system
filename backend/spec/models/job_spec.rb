@@ -6,14 +6,14 @@ RSpec.describe Job, type: :model do
   describe "associations" do
     it { should belong_to(:client) }
     it { should have_one(:assignment) }
+    it { should have_one(:active_assignment) }
   end
 
   describe "validations" do
     it { should validate_presence_of(:start_date) }
     it { should validate_presence_of(:day_rate) }
+    it { should validate_presence_of(:title) }
     it { should validate_numericality_of(:day_rate).is_greater_than(0) }
-
-    it {should validate_presence_of(:title)}
   end
 
   describe "end_date_after_start_date" do
@@ -35,29 +35,139 @@ RSpec.describe Job, type: :model do
   end
 
   describe "scopes" do
-      it "active returns jobs that have started and not ended" do
-        active = create(:job, start_date: Date.today - 1.month, end_date: nil)
-        active_with_future_end = create(:job, start_date: Date.today - 1.month, end_date: Date.today + 1.month)
-        completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
-        upcoming = create(:job, start_date: Date.today + 1.month, end_date: nil)
-        expect(Job.active).to include(active, active_with_future_end)
-        expect(Job.active).not_to include(completed, upcoming)
+    describe ".current" do
+      it "includes jobs that have started with no end date" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        expect(Job.current).to include(job)
       end
 
-      it "completed returns jobs whose end date has passed" do
-        completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
-        active = create(:job, start_date: Date.today - 1.month, end_date: nil)
-        expect(Job.completed).to include(completed)
-        expect(Job.completed).not_to include(active)
+      it "includes jobs that have started with a future end date" do
+        job = create(:job, start_date: 1.month.ago, end_date: 1.month.from_now)
+        expect(Job.current).to include(job)
       end
 
-      it "upcoming returns jobs that have not started yet" do
-        upcoming = create(:job, start_date: Date.today + 1.month, end_date: nil)
-        active = create(:job, start_date: Date.today - 1.month, end_date: nil)
-        completed = create(:job, start_date: Date.today - 2.months, end_date: Date.today - 1.month)
-        expect(Job.upcoming).to include(upcoming)
-        expect(Job.upcoming).not_to include(active, completed)
+      it "excludes upcoming jobs" do
+        job = create(:job, start_date: 1.month.from_now, end_date: nil)
+        expect(Job.current).not_to include(job)
       end
 
-  end 
+      it "excludes closed jobs" do
+        job = create(:job, start_date: 2.months.ago, end_date: 1.month.ago)
+        expect(Job.current).not_to include(job)
+      end
+    end
+
+    describe ".upcoming" do
+      it "includes jobs that have not started yet" do
+        job = create(:job, start_date: 1.month.from_now, end_date: nil)
+        expect(Job.upcoming).to include(job)
+      end
+
+      it "excludes jobs that have already started" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        expect(Job.upcoming).not_to include(job)
+      end
+
+      it "excludes closed jobs" do
+        job = create(:job, start_date: 2.months.ago, end_date: 1.month.ago)
+        expect(Job.upcoming).not_to include(job)
+      end
+    end
+
+    describe ".closed" do
+      it "includes jobs whose end date has passed" do
+        job = create(:job, start_date: 2.months.ago, end_date: 1.month.ago)
+        expect(Job.closed).to include(job)
+      end
+
+      it "excludes jobs with no end date" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        expect(Job.closed).not_to include(job)
+      end
+
+      it "excludes jobs with a future end date" do
+        job = create(:job, start_date: 1.month.ago, end_date: 1.month.from_now)
+        expect(Job.closed).not_to include(job)
+      end
+    end
+
+    describe ".assigned" do
+      it "includes jobs with an active assignment" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        create(:assignment, job: job, end_date: nil)
+        expect(Job.assigned).to include(job)
+      end
+
+      it "excludes jobs with only a closed assignment" do
+        job = create(:job, start_date: 2.months.ago, end_date: nil)
+        create(:assignment, job: job, end_date: 1.month.ago)
+        expect(Job.assigned).not_to include(job)
+      end
+
+      it "excludes jobs with no assignment" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        expect(Job.assigned).not_to include(job)
+      end
+    end
+
+    describe ".unassigned" do
+      it "includes jobs with no assignment" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        expect(Job.unassigned).to include(job)
+      end
+
+      it "includes jobs with only a closed assignment" do
+        job = create(:job, start_date: 2.months.ago, end_date: nil)
+        create(:assignment, job: job, end_date: 1.month.ago)
+        expect(Job.unassigned).to include(job)
+      end
+
+      it "excludes jobs with an active assignment" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        create(:assignment, job: job, end_date: nil)
+        expect(Job.unassigned).not_to include(job)
+      end
+    end
+
+    describe ".open" do
+      it "includes current unassigned jobs" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        expect(Job.open).to include(job)
+      end
+
+      it "excludes current assigned jobs" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        create(:assignment, job: job, end_date: nil)
+        expect(Job.open).not_to include(job)
+      end
+
+      it "excludes closed jobs" do
+        job = create(:job, start_date: 2.months.ago, end_date: 1.month.ago)
+        expect(Job.open).not_to include(job)
+      end
+
+      it "excludes upcoming jobs" do
+        job = create(:job, start_date: 1.month.from_now, end_date: nil)
+        expect(Job.open).not_to include(job)
+      end
+    end
+
+    describe ".available" do
+      it "includes upcoming unassigned jobs" do
+        job = create(:job, start_date: 1.month.from_now, end_date: nil)
+        expect(Job.available).to include(job)
+      end
+
+      it "excludes upcoming assigned jobs" do
+        job = create(:job, start_date: 1.month.from_now, end_date: nil)
+        create(:assignment, job: job, end_date: nil)
+        expect(Job.available).not_to include(job)
+      end
+
+      it "excludes current jobs" do
+        job = create(:job, start_date: 1.month.ago, end_date: nil)
+        expect(Job.available).not_to include(job)
+      end
+    end
+  end
 end

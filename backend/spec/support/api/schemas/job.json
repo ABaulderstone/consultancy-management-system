@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "title", "start_date", "day_rate", "client"],
+  "properties": {
+    "id": { "type": "integer" },
+    "title": { "type": "string" },
+    "start_date": { "type": "string" },
+    "end_date": { "type": ["string", "null"] },
+    "day_rate": { "type": "number" },
+    "client": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "assignment": {
+      "type": ["object", "null"],
+      "required": ["id", "start_date", "user"],
+      "properties": {
+        "id": { "type": "integer" },
+        "start_date": { "type": "string" },
+        "user": {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "name": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
