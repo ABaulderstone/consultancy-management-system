@@ -9,9 +9,9 @@ class Job < ApplicationRecord
   validate :end_date_after_start_date
 
   # date-based
-  scope :current,   -> { where("start_date <= ? AND (end_date IS NULL OR end_date >= ?)", Date.today, Date.today) }
-  scope :upcoming,  -> { where("start_date > ?", Date.today) }
-  scope :closed,    -> { where("end_date < ?", Date.today) }
+  scope :current, -> { where("jobs.end_date IS NULL OR jobs.end_date >= ?", Date.today).where("jobs.start_date <= ?", Date.today) }
+  scope :upcoming, -> { where("jobs.start_date > ?", Date.today) }
+  scope :closed,   -> { where("jobs.end_date < ?", Date.today) }
 
   # assignment-based
   scope :assigned,    -> { where(id: Assignment.where(end_date: nil).select(:job_id)) }

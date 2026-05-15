@@ -8,7 +8,7 @@
 
 	interface Props extends HTMLSelectAttributes {
 		options: Option[];
-		value?: number;
+		value?: number | string;
 	}
 
 	let { options, value = $bindable(), ...rest }: Props = $props();
