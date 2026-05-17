@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     mount Rswag::Api::Engine => "/api-docs"
     mount Rswag::Ui::Engine => "/api-docs"
   end
+  
   get "users/current"
 
   resources :users, param: :slug do
@@ -18,6 +19,12 @@ Rails.application.routes.draw do
   resources :positions, only: [:index]
   resources :contracts, only: [:create]
   resources :jobs, only: [:index]
+  
+  resources :clients, only: [:index] do
+  collection do
+    get :simple
+  end
+end
 
   
   namespace :analytics do
